@@ -1,0 +1,76 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
+  HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
+  HOSTINGER_PASSWORD: ${{ secrets.HOSTINGER_PASSWORD }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Build Frontend
+      run: |
+        cd frontend
+        npm install --production
+        npm run build
+        cd ..
+      
+    - name: Install Backend Dependencies
+      run: |
+        cd backend
+        npm install --production
+        cd ..
+      
+    - name: Deploy to Hostinger via SSH
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOSTINGER_HOST }}
+        username: ${{ secrets.HOSTINGER_USER }}
+        password: ${{ secrets.HOSTINGER_PASSWORD }}
+        port: 22
+        script: |
+          cd /home/${{ secrets.HOSTINGER_USER }}/public_html/ravari-store
+          
+          # Update from GitHub
+          git fetch origin main
+          git reset --hard origin/main
+          
+          # Install dependencies
+          cd backend && npm install --production && cd ..
+          cd frontend && npm install --production && npm run build && cd ..
+          
+          # Restart application
+          if command -v pm2 &> /dev/null; then
+            pm2 restart ravari-store || pm2 start ./backend/server.js --name ravari-store
+          fi
+          
+          echo "✓ Deployment complete!"
+      
+    - name: Notify Deployment Success
+      if: success()
+      run: |
+        echo "✅ Successfully deployed RAVARI to production!"
+        echo "Website: https://ravari.in"
+        echo "API: https://ravari.in/api/products"
+      
+    - name: Notify Deployment Failure
+      if: failure()
+      run: |
+        echo "❌ Deployment failed!"
+        echo "Check GitHub Actions logs for details"
+
