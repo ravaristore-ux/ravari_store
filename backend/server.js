@@ -37,19 +37,22 @@ let dbHostUsed = null;
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-async function tryConnect(host) {
+async function tryConnect(target) {
   const { Sequelize, DataTypes } = require('sequelize');
+  // target can be { host, port } for TCP or { socketPath } for unix socket
+  const conn = target.socketPath
+    ? { dialectOptions: { socketPath: target.socketPath } }
+    : { host: target.host, port: target.port || 3306, dialectOptions: { connectTimeout: 15000 } };
+
   const sequelize = new Sequelize(
     process.env.DB_NAME || 'u800235524_ravari_store',
     process.env.DB_USER || 'u800235524_ravari_user',
     process.env.DB_PASSWORD || 'Ravari@2026Secure123!',
     {
-      host,
-      port: process.env.DB_PORT || 3306,
       dialect: 'mysql',
       logging: false,
       pool: { max: 5, min: 0, acquire: 15000, idle: 10000 },
-      dialectOptions: { connectTimeout: 15000 }
+      ...conn
     }
   );
 
@@ -77,25 +80,36 @@ async function tryConnect(host) {
 }
 
 async function initDatabase() {
-  // Try several host strategies; 127.0.0.1 forces TCP (avoids missing unix socket)
-  const hosts = [process.env.DB_HOST, '127.0.0.1', 'localhost'].filter(Boolean);
-  for (let attempt = 1; attempt <= 5; attempt++) {
-    for (const host of hosts) {
+  const targets = [
+    process.env.DB_HOST ? { host: process.env.DB_HOST, label: `env:${process.env.DB_HOST}` } : null,
+    { host: '127.0.0.1', label: 'tcp:127.0.0.1' },
+    { socketPath: '/var/run/mysqld/mysqld.sock', label: 'sock:/var/run/mysqld/mysqld.sock' },
+    { socketPath: '/run/mysqld/mysqld.sock', label: 'sock:/run/mysqld/mysqld.sock' },
+    { socketPath: '/tmp/mysql.sock', label: 'sock:/tmp/mysql.sock' },
+    { socketPath: '/var/lib/mysql/mysql.sock', label: 'sock:/var/lib/mysql/mysql.sock' },
+    { host: 'localhost', label: 'tcp:localhost' }
+  ].filter(Boolean);
+
+  const errors = [];
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    for (const t of targets) {
       try {
-        console.log(`[RAVARI] DB attempt ${attempt} via ${host}...`);
-        Product = await tryConnect(host);
+        console.log(`[RAVARI] DB attempt ${attempt} via ${t.label}...`);
+        Product = await tryConnect(t);
         dbReady = true;
         dbError = null;
-        dbHostUsed = host;
-        console.log(`[RAVARI] ✅ Database connected via ${host}`);
+        dbHostUsed = t.label;
+        console.log(`[RAVARI] ✅ Database connected via ${t.label}`);
         return;
       } catch (err) {
-        dbError = `${host}: ${err.message}`;
-        console.error(`[RAVARI] ⚠️  DB connect failed (${host}): ${err.message}`);
+        const msg = `${t.label}: ${err.code || ''} ${err.message}`;
+        errors.push(msg);
+        console.error(`[RAVARI] ⚠️  DB failed ${msg}`);
       }
     }
     await sleep(3000);
   }
+  dbError = errors.slice(-7).join(' | ');
   console.error('[RAVARI] ⚠️  All DB attempts failed, using fallback data');
 }
 
