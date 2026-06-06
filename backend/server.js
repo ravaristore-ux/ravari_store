@@ -34,6 +34,7 @@ let Product = null;
 let dbReady = false;
 let dbError = null;
 let dbHostUsed = null;
+let dbDiag = null;
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
@@ -87,7 +88,38 @@ function withTimeout(promise, ms, label) {
   ]);
 }
 
+// Raw mysql2 diagnostic — captures the exact syscall/path behind EEXIST
+async function rawDiag() {
+  const results = [];
+  let mysql;
+  try { mysql = require('mysql2/promise'); }
+  catch (e) { return [{ step: 'require mysql2', code: e.code, msg: e.message }]; }
+
+  const cfgs = [
+    { name: 'env-host', opts: { host: process.env.DB_HOST || 'localhost', user: process.env.DB_USER || 'u800235524_ravari_user', password: process.env.DB_PASSWORD || 'Ravari@2026Secure123!', database: process.env.DB_NAME || 'u800235524_ravari_store', connectTimeout: 5000 } },
+    { name: 'tcp-127', opts: { host: '127.0.0.1', port: 3306, user: process.env.DB_USER || 'u800235524_ravari_user', password: process.env.DB_PASSWORD || 'Ravari@2026Secure123!', database: process.env.DB_NAME || 'u800235524_ravari_store', connectTimeout: 5000 } }
+  ];
+  for (const c of cfgs) {
+    try {
+      const conn = await mysql.createConnection(c.opts);
+      await conn.query('SELECT 1');
+      await conn.end();
+      results.push({ name: c.name, ok: true });
+    } catch (e) {
+      results.push({ name: c.name, ok: false, code: e.code, errno: e.errno, syscall: e.syscall, path: e.path, msg: e.message });
+    }
+  }
+  return results;
+}
+
 async function initDatabase() {
+  try {
+    dbDiag = await rawDiag();
+    console.log('[RAVARI] rawDiag:', JSON.stringify(dbDiag));
+  } catch (e) {
+    dbDiag = [{ step: 'rawDiag threw', msg: e.message }];
+  }
+
   const targets = [
     process.env.DB_HOST ? { host: process.env.DB_HOST, label: `env:${process.env.DB_HOST}` } : null,
     { socketPath: '/var/run/mysqld/mysqld.sock', label: 'sock:/var/run/mysqld/mysqld.sock' },
@@ -141,6 +173,7 @@ fastify.get('/api/health', async () => ({
   database: dbReady ? 'connected' : 'fallback',
   dbHost: dbHostUsed,
   dbError: dbError,
+  dbDiag: dbDiag,
   time: new Date().toISOString()
 }));
 
