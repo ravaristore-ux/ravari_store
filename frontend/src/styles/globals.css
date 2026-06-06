@@ -1,0 +1,177 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #ffffff;
+  color: #1a1a1a;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+.slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Responsive Images */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Form Inputs */
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+textarea,
+select {
+  @apply transition-colors duration-200;
+}
+
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='number']:focus,
+textarea:focus,
+select:focus {
+  @apply outline-none ring-2 ring-black ring-offset-2;
+}
+
+/* Button Styles */
+button {
+  @apply transition-all duration-200;
+}
+
+button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* Link Styles */
+a {
+  @apply text-black no-underline;
+}
+
+a:hover {
+  @apply text-gray-700;
+}
+
+/* Utility Classes */
+.container-centered {
+  @apply max-w-7xl mx-auto px-4;
+}
+
+.section-spacing {
+  @apply py-16 md:py-24;
+}
+
+.text-gradient {
+  @apply bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent;
+}
+
+/* Loading State */
+.skeleton {
+  @apply bg-gray-200 animate-pulse rounded;
+}
+
+/* Card Styles */
+.card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 transition-shadow hover:shadow-md;
+}
+
+/* Badge Styles */
+.badge {
+  @apply inline-block px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+.badge-primary {
+  @apply bg-black text-white;
+}
+
+.badge-secondary {
+  @apply bg-gray-200 text-gray-900;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-900;
+}
+
+.badge-danger {
+  @apply bg-red-100 text-red-900;
+}
+
+/* Line Clamp */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
