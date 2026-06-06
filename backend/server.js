@@ -29,29 +29,63 @@ if (fs.existsSync(frontendBuild)) {
 // Product images
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
-// MySQL Connection via Sequelize
-const sequelize = new Sequelize(
-  process.env.DB_NAME || 'u800235524_ravari_store',
-  process.env.DB_USER || 'u800235524_ravari_user',
-  process.env.DB_PASSWORD || 'Ravari@2026Secure123!',
-  {
-    host: process.env.DB_HOST || '127.0.0.1',
-    port: process.env.DB_PORT || 3306,
-    dialect: 'mysql',
-    logging: false,
-    pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
-    connectTimeout: 10000
-  }
-);
+// Database Connection - Try MySQL first, fallback to MongoDB
+let dbConnected = false;
+let sequelize = null;
 
-sequelize.authenticate()
-  .then(() => {
-    console.log('✅ MySQL connected');
-    return sequelize.sync({ alter: true });
+// Try MySQL Connection via Sequelize first
+if (process.env.DB_HOST || process.env.NODE_ENV === 'production') {
+  console.log('🔄 Attempting MySQL connection...');
+  const { Sequelize: Seq } = require('sequelize');
+  sequelize = new Seq(
+    process.env.DB_NAME || 'u800235524_ravari_store',
+    process.env.DB_USER || 'u800235524_ravari_user',
+    process.env.DB_PASSWORD || 'Ravari@2026Secure123!',
+    {
+      host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 3306,
+      dialect: 'mysql',
+      logging: false,
+      pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
+      connectTimeout: 10000
+    }
+  );
+
+  sequelize.authenticate()
+    .then(() => {
+      console.log('✅ MySQL connected');
+      dbConnected = true;
+      return sequelize.sync({ alter: true });
+    })
+    .catch(err => {
+      console.warn('⚠️  MySQL connection failed:', err.message);
+      sequelize = null;
+      // Fall back to MongoDB
+      initMongoDB();
+    });
+
+  global.sequelize = sequelize;
+} else {
+  // Development: Try MongoDB first
+  initMongoDB();
+}
+
+function initMongoDB() {
+  const mongoose = require('mongoose');
+  console.log('🔄 Attempting MongoDB connection...');
+  mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ravari', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
   })
-  .catch(err => console.error('❌ Database error:', err));
-
-global.sequelize = sequelize;
+  .then(() => {
+    console.log('✅ MongoDB connected');
+    dbConnected = true;
+  })
+  .catch(err => {
+    console.error('❌ Database error (both MySQL and MongoDB failed):', err.message);
+    console.error('⚠️  Starting server without database - API will return placeholder data');
+  });
+}
 
 // Routes
 app.use('/api/products', require('./routes/products'));
