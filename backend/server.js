@@ -1,8 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
+const { Sequelize } = require('sequelize');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
@@ -16,7 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Static files - Frontend build
 const frontendBuild = path.join(__dirname, '../frontend/build');
-const fs = require('fs');
 
 // Check if frontend build exists, if not create a simple fallback
 if (fs.existsSync(frontendBuild)) {
@@ -29,13 +29,29 @@ if (fs.existsSync(frontendBuild)) {
 // Product images
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ravari', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('✅ MongoDB connected'))
-.catch(err => console.error('❌ MongoDB error:', err));
+// MySQL Connection via Sequelize
+const sequelize = new Sequelize(
+  process.env.DB_NAME || 'u800235524_ravari_store',
+  process.env.DB_USER || 'u800235524_ravari_user',
+  process.env.DB_PASSWORD || 'Ravari@2026Secure123!',
+  {
+    host: process.env.DB_HOST || '127.0.0.1',
+    port: process.env.DB_PORT || 3306,
+    dialect: 'mysql',
+    logging: false,
+    pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
+    connectTimeout: 10000
+  }
+);
+
+sequelize.authenticate()
+  .then(() => {
+    console.log('✅ MySQL connected');
+    return sequelize.sync({ alter: true });
+  })
+  .catch(err => console.error('❌ Database error:', err));
+
+global.sequelize = sequelize;
 
 // Routes
 app.use('/api/products', require('./routes/products'));
