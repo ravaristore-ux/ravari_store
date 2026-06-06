@@ -15,7 +15,7 @@ function ProductCard({ product, onAddToCart, onToggleWishlist, isInWishlist }) {
             <div className="absolute inset-0 bg-gradient-to-r from-amber-100 to-orange-100 animate-pulse"></div>
           )}
           <img
-            src={`${product.thumbnail || product.images?.[0]?.url || product.images?.[0] || '/placeholder.jpg'}`}
+            src={`${product.thumbnail || product.images?.[0]?.url || '/placeholder.jpg'}`}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             onLoad={() => setImageLoading(false)}

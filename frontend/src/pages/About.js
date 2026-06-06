@@ -1,22 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { FiAward, FiHeart, FiGlobe, FiUsers } from 'react-icons/fi';
-import SEO from '../components/SEO';
-import { SEO_CONFIG } from '../utils/seoConstants';
-import { trackPageView } from '../utils/ga4Tracking';
 
 function About() {
-  useEffect(() => {
-    trackPageView('/about', 'About - RAVARI');
-  }, []);
-
   return (
     <div className="min-h-screen bg-white">
-      <SEO
-        title={SEO_CONFIG.pages.about.title}
-        description={SEO_CONFIG.pages.about.description}
-        keywords={SEO_CONFIG.pages.about.keywords}
-        canonical={`${SEO_CONFIG.site.url}/about`}
-      />
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-amber-50 to-orange-50 border-b-4 border-amber-200 py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4">
