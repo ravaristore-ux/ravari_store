@@ -47,12 +47,16 @@ if (process.env.DB_HOST || process.env.NODE_ENV === 'production') {
       dialect: 'mysql',
       logging: false,
       pool: { max: 5, min: 0, acquire: 30000, idle: 10000 },
-      connectTimeout: 10000
+      connectTimeout: 3000
     }
   );
 
-  // Connect in background without blocking server startup
-  sequelize.authenticate()
+  // Connect in background with timeout
+  const dbTimeout = new Promise((resolve, reject) => {
+    setTimeout(() => reject(new Error('Database connection timeout')), 3500);
+  });
+
+  Promise.race([sequelize.authenticate(), dbTimeout])
     .then(() => {
       console.log('✅ MySQL connected');
       dbConnected = true;
