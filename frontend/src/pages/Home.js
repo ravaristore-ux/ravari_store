@@ -177,20 +177,22 @@ function Home() {
               >
                 <video
                   className="w-full h-96 object-cover bg-gray-800 group-hover:scale-105 transition duration-300"
-                  muted
-                  autoPlay
                   loop
                   preload="metadata"
                   playsInline
                   poster={`/images/p${idx + 1}-a.png`}
                   onMouseEnter={(e) => {
-                    e.currentTarget.muted = false;
-                    e.currentTarget.volume = 1;
-                    const p = e.currentTarget.play();
+                    const v = e.currentTarget;
+                    v.muted = false;
+                    v.volume = 1;
+                    const p = v.play();
                     if (p && p.catch) p.catch(() => {});
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.muted = true;
+                    const v = e.currentTarget;
+                    v.pause();
+                    v.muted = true;
+                    try { v.currentTime = 0; } catch (_) {}
                   }}
                 >
                   <source
@@ -198,11 +200,6 @@ function Home() {
                     type="video/mp4"
                   />
                 </video>
-
-                {/* Camera Icon Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none group-hover:opacity-0 transition">
-                  <div className="text-6xl opacity-40">🎥</div>
-                </div>
               </div>
             ))}
           </div>
