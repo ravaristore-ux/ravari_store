@@ -178,9 +178,8 @@ function Home() {
                 <video
                   className="w-full h-96 object-cover bg-gray-800 group-hover:scale-105 transition duration-300"
                   loop
-                  preload="metadata"
+                  preload="auto"
                   playsInline
-                  poster={`/images/p${idx + 1}-a.png`}
                   onMouseEnter={(e) => {
                     const v = e.currentTarget;
                     v.muted = false;
@@ -192,11 +191,11 @@ function Home() {
                     const v = e.currentTarget;
                     v.pause();
                     v.muted = true;
-                    try { v.currentTime = 0; } catch (_) {}
+                    try { v.currentTime = 0.1; } catch (_) {}
                   }}
                 >
                   <source
-                    src={`/videos/Ravari%20Product%20Video%20-%20${videoNum}.mp4`}
+                    src={`/videos/Ravari%20Product%20Video%20-%20${videoNum}.mp4#t=0.1`}
                     type="video/mp4"
                   />
                 </video>
