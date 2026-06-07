@@ -223,15 +223,16 @@ function Home() {
             ))}
           </div>
         ) : featuredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex flex-wrap justify-center gap-8">
             {featuredProducts.map(product => (
-              <ProductCard
-                key={product._id}
-                product={product}
-                onAddToCart={handleAddToCart}
-                onToggleWishlist={handleToggleWishlist}
-                isInWishlist={false}
-              />
+              <div key={product._id} className="w-full sm:w-80 max-w-sm">
+                <ProductCard
+                  product={product}
+                  onAddToCart={handleAddToCart}
+                  onToggleWishlist={handleToggleWishlist}
+                  isInWishlist={false}
+                />
+              </div>
             ))}
           </div>
         ) : (
@@ -258,15 +259,16 @@ function Home() {
               ))}
             </div>
           ) : newArrivals.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="flex flex-wrap justify-center gap-8">
               {newArrivals.map(product => (
-                <ProductCard
-                  key={product._id}
-                  product={product}
-                  onAddToCart={handleAddToCart}
-                  onToggleWishlist={handleToggleWishlist}
-                  isInWishlist={false}
-                />
+                <div key={product._id} className="w-full sm:w-80 max-w-sm">
+                  <ProductCard
+                    product={product}
+                    onAddToCart={handleAddToCart}
+                    onToggleWishlist={handleToggleWishlist}
+                    isInWishlist={false}
+                  />
+                </div>
               ))}
             </div>
           ) : (
