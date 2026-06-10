@@ -2,176 +2,187 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-/* Global Styles */
+/* ── RAVARI Design Tokens ────────────────────────────── */
+:root {
+  --espresso:   #1A0F0A;
+  --cognac:     #6B3A2A;
+  --cognac-mid: #8B5A3A;
+  --gold:       #C9A84C;
+  --gold-light: #E8D5A3;
+  --cream:      #FAF7F2;
+  --ivory:      #F4EFE6;
+  --charcoal:   #1C1C1C;
+  --warm-gray:  #6B6560;
+  --border:     #E8DDD4;
+}
+
+/* ── Reset ───────────────────────────────────────────── */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* ── Base Typography ─────────────────────────────────── */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Raleway', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #ffffff;
-  color: #1a1a1a;
+  color: var(--charcoal);
+  font-weight: 400;
+  letter-spacing: 0.01em;
 }
 
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', Georgia, serif;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
+/* ── Scrollbar ───────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--cognac-mid); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cognac); }
+
+/* ── Animations ──────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-::-webkit-scrollbar-thumb {
-  background: #888;
+.fade-in { animation: fadeIn 0.5s ease-out; }
+
+/* ── Luxury Utility Classes ──────────────────────────── */
+.font-serif    { font-family: 'Playfair Display', Georgia, serif; }
+.font-cormorant{ font-family: 'Cormorant Garamond', Georgia, serif; }
+.font-sans     { font-family: 'Raleway', sans-serif; }
+
+.text-espresso  { color: var(--espresso); }
+.text-cognac    { color: var(--cognac); }
+.text-gold      { color: var(--gold); }
+.text-warm-gray { color: var(--warm-gray); }
+.bg-cream       { background-color: var(--cream); }
+.bg-ivory       { background-color: var(--ivory); }
+.border-luxury  { border-color: var(--border); }
+
+/* Thin gold divider */
+.divider-gold {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  border: none;
+  margin: 0;
+}
+
+/* Gold text gradient */
+.text-gold-gradient {
+  background: linear-gradient(135deg, var(--gold) 0%, #A07830 50%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  background: linear-gradient(90deg, var(--ivory) 25%, #EDE5D8 50%, var(--ivory) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+/* Luxury button */
+.btn-primary {
+  display: inline-block;
+  background-color: var(--espresso);
+  color: #ffffff;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.875rem 2.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.btn-primary:hover {
+  background-color: var(--cognac);
+  transform: translateY(-1px);
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.btn-outline {
+  display: inline-block;
+  background-color: transparent;
+  color: var(--espresso);
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.875rem 2.5rem;
+  border: 1px solid var(--espresso);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-outline:hover {
+  background-color: var(--espresso);
+  color: #ffffff;
 }
 
-@keyframes slideDown {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* Section headings */
+.section-eyebrow {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
 }
 
-.fade-in {
-  animation: fadeIn 0.3s ease-in;
+/* Nav link underline */
+.nav-link {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--charcoal);
+  position: relative;
+  transition: color 0.2s;
 }
-
-.slide-down {
-  animation: slideDown 0.3s ease-out;
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: var(--cognac);
+  transition: width 0.3s ease;
 }
+.nav-link:hover { color: var(--cognac); }
+.nav-link:hover::after { width: 100%; }
 
-/* Responsive Images */
-img {
-  max-width: 100%;
-  height: auto;
-}
+/* Responsive images */
+img { max-width: 100%; height: auto; }
 
-/* Form Inputs */
-input[type='text'],
-input[type='email'],
-input[type='password'],
-input[type='number'],
-textarea,
-select {
-  @apply transition-colors duration-200;
-}
-
+/* Forms */
 input[type='text']:focus,
 input[type='email']:focus,
 input[type='password']:focus,
 input[type='number']:focus,
 textarea:focus,
 select:focus {
-  @apply outline-none ring-2 ring-black ring-offset-2;
+  @apply outline-none ring-1 ring-offset-0;
+  ring-color: var(--cognac);
 }
 
-/* Button Styles */
-button {
-  @apply transition-all duration-200;
-}
+button { @apply transition-all duration-200; }
+button:disabled { @apply opacity-50 cursor-not-allowed; }
 
-button:disabled {
-  @apply opacity-50 cursor-not-allowed;
-}
-
-/* Link Styles */
-a {
-  @apply text-black no-underline;
-}
-
-a:hover {
-  @apply text-gray-700;
-}
-
-/* Utility Classes */
-.container-centered {
-  @apply max-w-7xl mx-auto px-4;
-}
-
-.section-spacing {
-  @apply py-16 md:py-24;
-}
-
-.text-gradient {
-  @apply bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent;
-}
-
-/* Loading State */
-.skeleton {
-  @apply bg-gray-200 animate-pulse rounded;
-}
-
-/* Card Styles */
-.card {
-  @apply bg-white rounded-lg shadow-sm border border-gray-200 transition-shadow hover:shadow-md;
-}
-
-/* Badge Styles */
-.badge {
-  @apply inline-block px-3 py-1 rounded-full text-xs font-semibold;
-}
-
-.badge-primary {
-  @apply bg-black text-white;
-}
-
-.badge-secondary {
-  @apply bg-gray-200 text-gray-900;
-}
-
-.badge-success {
-  @apply bg-green-100 text-green-900;
-}
-
-.badge-danger {
-  @apply bg-red-100 text-red-900;
-}
-
-/* Line Clamp */
-.line-clamp-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
+a { text-decoration: none; }

@@ -1,93 +1,102 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiHeart, FiShoppingCart } from 'react-icons/fi';
-import { useDispatch } from 'react-redux';
 
 function ProductCard({ product, onAddToCart, onToggleWishlist, isInWishlist }) {
   const [imageLoading, setImageLoading] = useState(true);
+  const [hovered, setHovered] = useState(false);
+
+  const hasDiscount = product.salePrice && product.salePrice < product.price;
 
   return (
-    <div className="group bg-white border border-amber-100 rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-      {/* Product Image */}
+    <div
+      className="group"
+      style={{ background: '#fff' }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Image */}
       <Link to={`/products/${product.slug}`}>
-        <div className="relative overflow-hidden bg-gradient-to-br from-amber-50 to-orange-50 h-72">
-          {imageLoading && (
-            <div className="absolute inset-0 bg-gradient-to-r from-amber-100 to-orange-100 animate-pulse"></div>
-          )}
+        <div className="relative overflow-hidden" style={{ height: '320px', backgroundColor: '#F4EFE6' }}>
+          {imageLoading && <div className="absolute inset-0 skeleton" />}
           <img
-            src={`${product.thumbnail || product.images?.[0]?.url || '/placeholder.jpg'}`}
+            src={product.thumbnail || product.images?.[0]?.url || '/placeholder.jpg'}
             alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover transition-transform duration-700"
+            style={{ transform: hovered ? 'scale(1.06)' : 'scale(1)' }}
             onLoad={() => setImageLoading(false)}
-            onError={(e) => {
-              e.target.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23FEF3C7%22 width=%22400%22 height=%22400%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2224%22 fill=%22%23B45309%22%3E' + product.name + '%3C/text%3E%3C/svg%3E';
+            onError={e => {
+              e.target.src = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'%3E%3Crect fill='%23F4EFE6' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='serif' font-size='18' fill='%236B3A2A'%3ERAVARI%3C/text%3E%3C/svg%3E`;
               setImageLoading(false);
             }}
           />
-          {product.isNew && (
-            <span className="absolute top-4 right-4 bg-gradient-to-r from-amber-700 to-amber-900 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-              🆕 NEW
-            </span>
-          )}
-          {product.salePrice && product.salePrice < product.price && (
-            <span className="absolute top-4 left-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-              ✨ SALE
-            </span>
-          )}
+          {/* Badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+            {product.isNew && (
+              <span style={{ backgroundColor: '#1A0F0A', color: '#E8D5A3', fontFamily: 'Raleway, sans-serif', fontSize: '0.6rem', letterSpacing: '0.15em', fontWeight: 600, padding: '3px 10px' }}>
+                NEW
+              </span>
+            )}
+            {hasDiscount && (
+              <span style={{ backgroundColor: '#6B3A2A', color: '#fff', fontFamily: 'Raleway, sans-serif', fontSize: '0.6rem', letterSpacing: '0.15em', fontWeight: 600, padding: '3px 10px' }}>
+                SALE
+              </span>
+            )}
+          </div>
+          {/* Wishlist button */}
+          <button
+            onClick={e => { e.preventDefault(); onToggleWishlist(product._id); }}
+            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center transition-opacity duration-200"
+            style={{ backgroundColor: 'rgba(255,255,255,0.9)', opacity: hovered || isInWishlist ? 1 : 0 }}
+            aria-label="Add to wishlist"
+          >
+            <FiHeart size={15} style={{ color: isInWishlist ? '#6B3A2A' : '#1C1C1C', fill: isInWishlist ? '#6B3A2A' : 'none' }} />
+          </button>
         </div>
       </Link>
 
-      {/* Product Info */}
-      <div className="p-5">
+      {/* Info */}
+      <div className="pt-4 pb-5 px-1">
+        <p className="section-eyebrow mb-1" style={{ color: '#C9A84C' }}>{product.category}</p>
         <Link to={`/products/${product.slug}`}>
-          <h3 className="font-bold text-gray-900 group-hover:text-amber-700 transition text-base line-clamp-2 mb-2">
+          <h3 style={{ fontFamily: 'Playfair Display, Georgia, serif', fontSize: '1rem', fontWeight: 500, color: '#1A0F0A', marginBottom: '0.5rem', lineHeight: 1.3 }}
+            className="line-clamp-2 hover:opacity-70 transition-opacity">
             {product.name}
           </h3>
         </Link>
 
-        {/* Category */}
-        <p className="text-xs font-semibold text-amber-700 mb-3 uppercase tracking-wide">{product.category}</p>
-
-        {/* Rating */}
         {product.rating > 0 && (
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex text-yellow-400">
-              {'⭐'.repeat(Math.round(product.rating))}
+          <div className="flex items-center gap-1.5 mb-3">
+            <div className="flex gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <svg key={i} width="10" height="10" viewBox="0 0 10 10" fill={i < Math.round(product.rating) ? '#C9A84C' : '#E8DDD4'}>
+                  <polygon points="5,1 6.18,3.73 9.09,3.90 7,5.98 7.63,9 5,7.5 2.37,9 3,5.98 0.91,3.90 3.82,3.73" />
+                </svg>
+              ))}
             </div>
-            <span className="text-xs text-gray-600 font-semibold">({product.reviewCount} reviews)</span>
+            <span style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.65rem', color: '#6B6560' }}>({product.reviewCount})</span>
           </div>
         )}
 
-        {/* Price */}
-        <div className="flex items-center gap-3 mb-5">
-          <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-orange-600">
-            ₹{product.salePrice || product.price}
-          </span>
-          {product.salePrice && product.salePrice < product.price && (
-            <span className="text-sm text-gray-400 line-through font-semibold">
-              ₹{product.price}
+        <div className="flex items-center justify-between">
+          <div className="flex items-baseline gap-2">
+            <span style={{ fontFamily: 'Playfair Display, Georgia, serif', fontSize: '1.1rem', fontWeight: 600, color: '#1A0F0A' }}>
+              ₹{(product.salePrice || product.price)?.toLocaleString('en-IN')}
             </span>
-          )}
-        </div>
+            {hasDiscount && (
+              <span style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.8rem', color: '#B8A89A', textDecoration: 'line-through' }}>
+                ₹{product.price?.toLocaleString('en-IN')}
+              </span>
+            )}
+          </div>
 
-        {/* Actions */}
-        <div className="flex gap-3">
           <button
             onClick={() => onAddToCart(product)}
-            className="flex-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white py-2.5 rounded-lg text-sm font-bold hover:shadow-lg transition flex items-center justify-center gap-2 transform hover:scale-105"
+            className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
+            style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.65rem', letterSpacing: '0.1em', fontWeight: 600, color: '#6B3A2A', textTransform: 'uppercase' }}
           >
-            <FiShoppingCart className="w-4 h-4" />
-            Add to Cart
-          </button>
-          <button
-            onClick={() => onToggleWishlist(product._id)}
-            className={`px-4 py-2.5 rounded-lg border-2 transition font-bold ${
-              isInWishlist
-                ? 'bg-red-50 border-red-400 text-red-600 hover:bg-red-100'
-                : 'border-amber-300 text-gray-600 hover:border-amber-500 hover:bg-amber-50'
-            }`}
-          >
-            <FiHeart className="w-4 h-4" />
+            <FiShoppingCart size={13} />
+            Add
           </button>
         </div>
       </div>

@@ -1,97 +1,92 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FiInstagram, FiFacebook, FiLinkedin, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import { FiInstagram, FiFacebook, FiLinkedin, FiMail, FiPhone } from 'react-icons/fi';
 
 function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-br from-amber-50 to-orange-50 text-gray-800 mt-12 border-t-4 border-amber-200">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          {/* Brand & Contact */}
-          <div>
-            <h3 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-amber-700 to-orange-600 mb-3">
-              🎨 RAVARI
-            </h3>
+    <footer style={{ backgroundColor: '#1A0F0A', color: '#E8DDD4' }}>
+      {/* Gold divider */}
+      <div className="divider-gold" />
 
-            {/* Contact Info */}
-            <div className="space-y-2 mb-4 text-xs font-semibold">
-              <div className="flex items-center gap-2 text-gray-700">
-                <FiPhone className="text-amber-700" />
-                <a href="tel:+919084260869" className="hover:text-amber-700 transition">
-                  +91 90842 60869
-                </a>
-              </div>
-              <div className="flex items-center gap-2 text-gray-700">
-                <FiMail className="text-amber-700" />
-                <a href="mailto:Ravari.store@gmail.com" className="hover:text-amber-700 transition">
-                  Ravari.store@gmail.com
-                </a>
-              </div>
-            </div>
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-14">
 
-            {/* Social Media Links */}
-            <h5 className="font-black text-amber-900 mb-2 uppercase text-xs tracking-widest">Follow</h5>
-            <div className="flex gap-3 mb-4">
-              <a href="https://www.instagram.com/ravari_store?igsh=MXNkdjBmZnFnMjAwcg==" target="_blank" rel="noopener noreferrer" className="text-amber-700 hover:text-orange-600 transition transform hover:scale-125 text-2xl" title="Instagram">
-                <FiInstagram />
-              </a>
-              <a href="https://www.facebook.com/profile.php?id=61585497611013" target="_blank" rel="noopener noreferrer" className="text-amber-700 hover:text-orange-600 transition transform hover:scale-125 text-2xl" title="Facebook">
-                <FiFacebook />
-              </a>
-              <a href="https://www.linkedin.com/in/ravari-store-854b98406" target="_blank" rel="noopener noreferrer" className="text-amber-700 hover:text-orange-600 transition transform hover:scale-125 text-2xl" title="LinkedIn">
-                <FiLinkedin />
-              </a>
+          {/* Brand Column */}
+          <div className="md:col-span-1">
+            <img
+              src="/images/Ravari%20Logo%20Banner.jpeg"
+              alt="RAVARI"
+              style={{ height: '40px', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.9, marginBottom: '1rem' }}
+            />
+            <p style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: '0.95rem', lineHeight: 1.75, color: '#B8A89A', fontStyle: 'italic' }}>
+              Handcrafted leather goods, born from a devotion to timeless elegance and artisan precision.
+            </p>
+            <div className="flex gap-4 mt-5">
+              {[
+                { href: 'https://www.instagram.com/ravari_store?igsh=MXNkdjBmZnFnMjAwcg==', icon: <FiInstagram size={17} />, label: 'Instagram' },
+                { href: 'https://www.facebook.com/profile.php?id=61585497611013',             icon: <FiFacebook size={17} />,  label: 'Facebook' },
+                { href: 'https://www.linkedin.com/in/ravari-store-854b98406',                icon: <FiLinkedin size={17} />,  label: 'LinkedIn' },
+              ].map(({ href, icon, label }) => (
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label}
+                  style={{ color: '#C9A84C' }} className="hover:opacity-60 transition-opacity">
+                  {icon}
+                </a>
+              ))}
             </div>
           </div>
 
           {/* Shop */}
           <div>
-            <h4 className="text-amber-900 font-black mb-3 text-sm uppercase tracking-wider">Shop</h4>
-            <ul className="text-xs space-y-2">
-              <li>
-                <Link to="/products" className="text-gray-700 hover:text-amber-700 transition font-semibold">
-                  All Products
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-gray-700 hover:text-amber-700 transition font-semibold">
-                  Contact
-                </Link>
-              </li>
+            <h4 className="section-eyebrow mb-5" style={{ color: '#C9A84C' }}>Shop</h4>
+            <ul className="space-y-3">
+              {[
+                { to: '/products', label: 'All Products' },
+                { to: '/products?category=bags', label: 'Bags & Totes' },
+                { to: '/products?category=wallets', label: 'Wallets' },
+                { to: '/products?category=accessories', label: 'Accessories' },
+              ].map(({ to, label }) => (
+                <li key={label}>
+                  <Link to={to} style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.8rem', color: '#B8A89A', letterSpacing: '0.04em' }}
+                    className="hover:opacity-70 transition-opacity">{label}</Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Support */}
+          {/* Company */}
           <div>
-            <h4 className="text-amber-900 font-black mb-3 text-sm uppercase tracking-wider">Support</h4>
-            <ul className="text-xs space-y-2">
-              <li>
-                <Link to="/contact" className="text-gray-700 hover:text-amber-700 transition font-semibold">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-gray-700 hover:text-amber-700 transition font-semibold">
-                  About Us
-                </Link>
-              </li>
+            <h4 className="section-eyebrow mb-5" style={{ color: '#C9A84C' }}>Company</h4>
+            <ul className="space-y-3">
+              {[
+                { to: '/about',   label: 'Our Story' },
+                { to: '/contact', label: 'Contact Us' },
+              ].map(({ to, label }) => (
+                <li key={label}>
+                  <Link to={to} style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.8rem', color: '#B8A89A', letterSpacing: '0.04em' }}
+                    className="hover:opacity-70 transition-opacity">{label}</Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* About */}
+          {/* Contact */}
           <div>
-            <h4 className="text-amber-900 font-black mb-3 text-sm uppercase tracking-wider">Info</h4>
-            <ul className="text-xs space-y-2">
+            <h4 className="section-eyebrow mb-5" style={{ color: '#C9A84C' }}>Get in Touch</h4>
+            <ul className="space-y-3">
               <li>
-                <a href="#" className="text-gray-700 hover:text-amber-700 transition font-semibold">
-                  Privacy Policy
+                <a href="tel:+919084260869" className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+                  style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.8rem', color: '#B8A89A' }}>
+                  <FiPhone size={13} style={{ color: '#C9A84C' }} />
+                  +91 90842 60869
                 </a>
               </li>
               <li>
-                <a href="#" className="text-gray-700 hover:text-amber-700 transition font-semibold">
-                  Terms of Service
+                <a href="mailto:Ravari.store@gmail.com" className="flex items-center gap-2 hover:opacity-70 transition-opacity"
+                  style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.8rem', color: '#B8A89A' }}>
+                  <FiMail size={13} style={{ color: '#C9A84C' }} />
+                  Ravari.store@gmail.com
                 </a>
               </li>
             </ul>
@@ -99,10 +94,18 @@ function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t-2 border-amber-200 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-gray-700">
-          <p className="font-semibold text-xs">
-            &copy; {currentYear} <span className="text-amber-700 font-black">RAVARI</span>. All rights reserved.
+        <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4"
+          style={{ borderTop: '1px solid rgba(201,168,76,0.2)' }}>
+          <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.7rem', color: '#6B6560', letterSpacing: '0.08em' }}>
+            &copy; {currentYear} RAVARI. All rights reserved.
           </p>
+          <div className="flex gap-6">
+            {['Privacy Policy', 'Terms of Service'].map(label => (
+              <a key={label} href="#"
+                style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.7rem', color: '#6B6560', letterSpacing: '0.08em' }}
+                className="hover:opacity-70 transition-opacity">{label}</a>
+            ))}
+          </div>
         </div>
       </div>
     </footer>
