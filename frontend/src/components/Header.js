@@ -114,12 +114,13 @@ export default function Header() {
                 lineHeight: 1, paddingLeft: '0.3em',
               }}>RAVARI</span>
               <span className="ravari-tagline" style={{
-                fontFamily: 'Jost, sans-serif', fontSize: '0.42rem',
-                fontWeight: 500, letterSpacing: '0.18em',
-                color: 'rgba(201,168,76,0.75)', textTransform: 'uppercase',
-                whiteSpace: 'nowrap', paddingLeft: '0.35em',
+                fontFamily: 'Jost, sans-serif', fontSize: '0.44rem',
+                fontWeight: 400, letterSpacing: '0.22em',
+                color: 'rgba(201,168,76,0.8)', textTransform: 'uppercase',
+                whiteSpace: 'nowrap', paddingLeft: '0.55em',
+                display: 'block', textAlign: 'center',
               }}>
-                DURABLE &nbsp;·&nbsp; FULL GRAIN &nbsp;·&nbsp; HANDSTITCHED
+                DURABLE &nbsp;|&nbsp; TEXTURED &nbsp;|&nbsp; FULL GRAIN &nbsp;|&nbsp; STITCHED &nbsp;|&nbsp; REINFORCED
               </span>
             </div>
           </Link>
