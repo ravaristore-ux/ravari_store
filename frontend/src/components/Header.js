@@ -215,14 +215,6 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
-          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.85rem' }}>
-            <a href="tel:+919084260869" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'rgba(255,255,255,0.55)', fontSize: '0.78rem', fontFamily: 'Jost, sans-serif', textDecoration: 'none' }}>
-              <FiPhone size={13} style={{ color: GOLD }} /> +91 90842 60869
-            </a>
-            <a href="mailto:ravari.store@gmail.com" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'rgba(255,255,255,0.55)', fontSize: '0.78rem', fontFamily: 'Jost, sans-serif', textDecoration: 'none' }}>
-              <FiMail size={13} style={{ color: GOLD }} /> ravari.store@gmail.com
-            </a>
-          </div>
         </div>
       )}
     </>
