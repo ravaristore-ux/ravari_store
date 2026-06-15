@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-const Fastify = require('fastify');
-const path = require('path');
-const fs = require('fs');
+const Fastify    = require('fastify');
+const path       = require('path');
+const fs         = require('fs');
+const nodemailer = require('nodemailer');
 
 const fastify = Fastify({ logger: true, bodyLimit: 26214400 });
 
@@ -1073,25 +1074,67 @@ fastify.setNotFoundHandler((request, reply) => {
 });
 
 // ── Contact form ──────────────────────────────────────────────────────────────
+const mailer = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER || 'ravari.store@gmail.com',
+    pass: process.env.GMAIL_APP_PASS || '',
+  },
+});
+
 fastify.post('/api/contact', async (request, reply) => {
   const { name, email, phone, message } = request.body || {};
   if (!name || !email || !message) return reply.code(400).send({ error: 'Missing required fields' });
+
+  // Send email
+  try {
+    await mailer.sendMail({
+      from: `"RAVARI Contact" <${process.env.GMAIL_USER || 'ravari.store@gmail.com'}>`,
+      to: 'ravari.store@gmail.com',
+      replyTo: email,
+      subject: `New Contact Message from ${name}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e0d8cc;padding:0;">
+          <div style="background:#0D0B08;padding:24px 28px;">
+            <h1 style="font-family:Georgia,serif;color:#C9A84C;font-size:22px;margin:0;letter-spacing:4px;">RAVARI</h1>
+            <p style="color:rgba(255,255,255,0.5);font-size:11px;margin:4px 0 0;letter-spacing:2px;text-transform:uppercase;">New Customer Message</p>
+          </div>
+          <div style="padding:28px;">
+            <table style="width:100%;border-collapse:collapse;font-size:14px;color:#333;">
+              <tr><td style="padding:8px 0;color:#888;width:100px;">Name</td><td style="padding:8px 0;font-weight:bold;">${name}</td></tr>
+              <tr><td style="padding:8px 0;color:#888;">Email</td><td style="padding:8px 0;"><a href="mailto:${email}" style="color:#C9A84C;">${email}</a></td></tr>
+              <tr><td style="padding:8px 0;color:#888;">Phone</td><td style="padding:8px 0;">${phone || '—'}</td></tr>
+            </table>
+            <hr style="border:none;border-top:1px solid #eee;margin:20px 0;">
+            <p style="color:#888;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Message</p>
+            <p style="font-size:15px;line-height:1.7;color:#222;white-space:pre-wrap;">${message}</p>
+          </div>
+          <div style="background:#f9f7f4;padding:16px 28px;border-top:1px solid #eee;">
+            <p style="font-size:12px;color:#aaa;margin:0;">Reply directly to this email to respond to ${name}.</p>
+          </div>
+        </div>
+      `,
+    });
+  } catch (mailErr) {
+    console.error('[contact] email error:', mailErr.message);
+    // Still save to DB even if email fails
+  }
+
+  // Save to DB
   try {
     await db.query(
       'INSERT INTO contact_messages (name, email, phone, message, created_at) VALUES (?, ?, ?, ?, NOW())',
       [name, email, phone || '', message]
     );
-    // Also create a notification so admin sees it
     await db.query(
       "INSERT INTO notifications (type, title, message, created_at) VALUES ('contact', ?, ?, NOW())",
       [`New message from ${name}`, message.substring(0, 120)]
     );
-    return reply.send({ success: true });
-  } catch (e) {
-    // If table doesn't exist yet, still return success (graceful)
-    console.error('[contact]', e.message);
-    return reply.send({ success: true });
+  } catch (dbErr) {
+    console.error('[contact] db error:', dbErr.message);
   }
+
+  return reply.send({ success: true });
 });
 
 // Start: listen first, then DB
