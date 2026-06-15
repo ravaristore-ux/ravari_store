@@ -105,7 +105,7 @@ export default function Cart() {
         </div>
       )}
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem 5rem', display: 'grid', gridTemplateColumns: '1fr 360px', gap: '2rem', alignItems: 'start' }}>
+      <div className="cart-layout" style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem 5rem', display: 'grid', gridTemplateColumns: '1fr 360px', gap: '2rem', alignItems: 'start' }}>
 
         {/* ── Cart Items ── */}
         <div>

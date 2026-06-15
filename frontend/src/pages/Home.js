@@ -318,7 +318,7 @@ export default function Home() {
       {/* ── BRAND STORY ──────────────────────────────────── */}
       <section style={{ backgroundColor: '#F5F3EE' }}>
         <div className="brand-story-grid" style={{ maxWidth: '1300px', margin: '0 auto' }}>
-          <div style={{ backgroundColor: '#E8E4DE', overflow: 'hidden', minHeight: '520px', position: 'relative' }}>
+          <div className="brand-story-image" style={{ backgroundColor: '#E8E4DE', overflow: 'hidden', minHeight: '520px', position: 'relative' }}>
             <img src="/static/videos/model2.webp" alt="RAVARI craftsmanship"
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
             {/* Subtle overlay label */}
@@ -353,7 +353,7 @@ export default function Home() {
             <div style={{ width: '40px', height: '1px', backgroundColor: '#C9A84C', marginBottom: '2rem', opacity: 0.6 }} />
 
             {/* Three pillars */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
+            <div className="brand-story-pillars" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem', marginBottom: '2.5rem' }}>
               {[
                 { num: '100%',  label: 'Full-Grain\nLeather' },
                 { num: 'Hand',  label: 'Stitched\n& Finished' },

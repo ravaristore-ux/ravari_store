@@ -206,36 +206,59 @@ button:disabled { opacity: 50%; cursor: not-allowed; }
   .header-nav-row { height: 38px !important; }
   .ravari-wordmark { font-size: 1.6rem !important; letter-spacing: 0.4em !important; }
   .ravari-tagline  { font-size: 0.38rem !important; letter-spacing: 0.12em !important; }
+  .ravari-logo-icon { height: 26px !important; }
 
   /* Hero arrows hidden on mobile */
   .hero-arrow { display: none !important; }
 
   /* Grids */
-  .category-grid { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-  .product-grid  { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-  .craft-grid    { grid-template-columns: repeat(2, 1fr); }
+  .category-grid    { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .product-grid     { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .craft-grid       { grid-template-columns: repeat(2, 1fr); }
   .brand-story-grid { grid-template-columns: 1fr; }
+
+  /* Cart & Checkout — collapse 2-col to 1-col */
+  .cart-layout     { grid-template-columns: 1fr !important; }
+  .checkout-layout { grid-template-columns: 1fr !important; }
+
+  /* Checkout address form — 1 col on mobile */
+  .address-form-grid { grid-template-columns: 1fr !important; }
+
+  /* Brand story */
+  .brand-story-text { padding: 2rem 1.25rem !important; }
+  .brand-story-pillars { grid-template-columns: 1fr !important; gap: 0.85rem !important; }
+  .brand-story-image { min-height: 280px !important; }
 
   /* Spacing */
   .section-padding { padding: 3.5rem 0; }
   .section-inner   { padding: 0 1rem; }
-
-  /* Brand story text padding */
-  .brand-story-text { padding: 2.5rem 1.5rem !important; }
 
   /* Section headings */
   .section-heading { font-size: 1.6rem !important; }
 
   /* Craft strip */
   .craft-item { padding: 1.5rem 1rem !important; }
+
+  /* About story */
+  .about-story-grid   { grid-template-columns: 1fr !important; }
+  .about-divider-col  { display: none !important; }
+  .about-craft-grid   { grid-template-columns: 1fr 1fr !important; }
+
+  /* Footer */
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 2rem !important; }
+  .footer-brand { grid-column: 1 / -1 !important; }
 }
 
 /* ════════════════════════════════════════════════════════
    SMALL MOBILE  ≤ 480px
    ════════════════════════════════════════════════════════ */
 @media (max-width: 480px) {
-  .ravari-wordmark { font-size: 1.35rem !important; letter-spacing: 0.3em !important; }
-  .category-grid  { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-  .product-grid   { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-  .craft-grid     { grid-template-columns: repeat(2, 1fr); }
+  .ravari-wordmark  { font-size: 1.2rem !important; letter-spacing: 0.25em !important; }
+  .ravari-logo-icon { height: 22px !important; }
+  .ravari-tagline   { display: none !important; }
+  .category-grid    { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+  .product-grid     { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+  .craft-grid       { grid-template-columns: repeat(2, 1fr); }
+  .footer-grid      { grid-template-columns: 1fr !important; }
+  .brand-story-pillars { grid-template-columns: repeat(3, 1fr) !important; }
 }

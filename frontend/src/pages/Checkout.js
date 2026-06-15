@@ -165,7 +165,7 @@ export default function Checkout() {
             ))}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '2rem', alignItems: 'start' }}>
+          <div className="checkout-layout" style={{ display: 'grid', gridTemplateColumns: '1fr 360px', gap: '2rem', alignItems: 'start' }}>
 
             {/* ── Left panel ── */}
             <div style={{ backgroundColor: '#FFFFFF', padding: '2rem', border: '1px solid #E8E4DE' }}>
@@ -174,7 +174,7 @@ export default function Checkout() {
               {step === 1 && (
                 <>
                   <h2 style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.7rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#0D0D0D', marginBottom: '1.5rem' }}>Delivery Address</h2>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
+                  <div className="address-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem' }}>
                     {[
                       { name: 'firstName', placeholder: 'First Name *', col: 1 },
                       { name: 'lastName',  placeholder: 'Last Name *',  col: 1 },
