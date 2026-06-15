@@ -104,6 +104,22 @@ function Products() {
           </div>
         </div>
 
+        {/* Product count + search label */}
+        {!loading && products.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
+            <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.7rem', color: '#8C8680' }}>
+              Showing <strong style={{ color: '#0D0D0D' }}>{products.length}</strong> {products.length === 1 ? 'product' : 'products'}
+              {filters.category ? <span> in <strong style={{ color: GOLD }}>{filters.category}</strong></span> : ''}
+              {filters.search ? <span> for <strong style={{ color: GOLD }}>"{filters.search}"</strong></span> : ''}
+            </p>
+            {filters.search && (
+              <button onClick={() => set('search', '')} style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.6rem', color: '#8C8680', border: '1px solid #D4CFC8', padding: '2px 10px', background: 'none', cursor: 'pointer' }}>
+                ✕ Clear search
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Grid */}
         {loading ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>

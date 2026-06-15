@@ -32,7 +32,7 @@ export default function Checkout() {
     firstName: '', lastName: '', email: user?.email || '',
     phone: '', street: '', city: '', state: '',
     postalCode: '', country: 'India',
-    paymentMethod: 'razorpay',
+    paymentMethod: 'razorpay', orderNotes: '',
   });
 
   useEffect(() => {
@@ -45,8 +45,13 @@ export default function Checkout() {
     }
   }, []);
 
+  const coupon   = useSelector(s => s.cart?.coupon || null);
   const subtotal = cartItems.reduce((a, i) => a + i.price * i.quantity, 0);
-  const discount = 0;
+  const discount = coupon
+    ? coupon.discountType === 'percent'
+      ? Math.round(subtotal * coupon.discountValue / 100)
+      : Math.min(coupon.discountValue, subtotal)
+    : 0;
   const shipping = subtotal > 5000 ? 0 : 100;
   const total    = subtotal - discount + shipping;
 
@@ -193,6 +198,15 @@ export default function Checkout() {
                         onBlur={e => e.target.style.borderColor = '#E0DBD4'} />
                     ))}
                   </div>
+                  {/* Order notes */}
+                  <div style={{ marginTop: '0.85rem' }}>
+                    <textarea name="orderNotes" value={form.orderNotes} onChange={set} rows={2}
+                      placeholder="Delivery instructions (optional) — e.g. call before delivery, leave at door..."
+                      style={{ ...inp, resize: 'none', fontSize: '0.78rem' }}
+                      onFocus={e => e.target.style.borderColor = '#C9A84C'}
+                      onBlur={e => e.target.style.borderColor = '#E0DBD4'} />
+                  </div>
+
                   <button onClick={() => addrValid && setStep(2)} disabled={!addrValid}
                     style={{ marginTop: '1.5rem', width: '100%', padding: '0.9rem', backgroundColor: addrValid ? '#0D0D0D' : '#D4CFC8', color: '#FFF', fontFamily: 'Jost, sans-serif', fontSize: '0.7rem', letterSpacing: '0.2em', textTransform: 'uppercase', border: 'none', cursor: addrValid ? 'pointer' : 'not-allowed', transition: 'background 0.2s' }}>
                     Continue to Payment

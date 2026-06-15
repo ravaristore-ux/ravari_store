@@ -45,8 +45,11 @@ export default function Cart() {
         body: JSON.stringify({ code: couponCode.trim().toUpperCase(), subtotal }),
       });
       const data = await res.json();
-      if (data.valid) { setCoupon({ code: data.code, discountType: data.type, discountValue: data.value }); }
-      else             { setCouponError(data.error || 'Invalid coupon code.'); }
+      if (data.valid) {
+        const c = { code: data.code, discountType: data.type, discountValue: data.value };
+        setCoupon(c);
+        dispatch({ type: 'SET_COUPON', payload: c });
+      } else { setCouponError(data.error || 'Invalid coupon code.'); }
     } catch {
       setCouponError('Could not apply coupon. Please try again.');
     } finally {
@@ -54,7 +57,7 @@ export default function Cart() {
     }
   };
 
-  const removeCoupon = () => { setCoupon(null); setCouponCode(''); setCouponError(''); };
+  const removeCoupon = () => { setCoupon(null); setCouponCode(''); setCouponError(''); dispatch({ type: 'SET_COUPON', payload: null }); };
 
   /* ── Empty cart ── */
   if (cartItems.length === 0) {
