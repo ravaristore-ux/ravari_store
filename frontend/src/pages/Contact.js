@@ -37,7 +37,7 @@ function Contact() {
     setFormData({ name: '', email: '', phone: '', message: '' });
   };
 
-  const whatsappNumber = '+919999999999'; // Replace with actual number
+  const whatsappNumber = '+919084260869';
   const whatsappMessage = encodeURIComponent('Hi RAVARI! I would like to know more about your products.');
 
   return (
@@ -153,8 +153,8 @@ function Contact() {
                   <FiPhone className="text-4xl text-amber-700 flex-shrink-0 mt-2" />
                   <div>
                     <h3 className="font-bold text-gray-900 text-lg mb-2">Phone</h3>
-                    <a href="tel:+919876543210" className="text-lg font-semibold text-amber-700 hover:text-orange-600">
-                      +91 9876 543 210
+                    <a href="tel:+919084260869" className="text-lg font-semibold text-amber-700 hover:text-orange-600">
+                      +91 90842 60869
                     </a>
                     <p className="text-sm text-gray-600 mt-2">Monday to Saturday, 10 AM - 6 PM</p>
                   </div>

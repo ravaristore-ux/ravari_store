@@ -115,27 +115,33 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Center — RAVARI */}
-          <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{ textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
+          {/* Center — Logo + RAVARI + tagline */}
+          <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            style={{ textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+
+            {/* Logo icon + RAVARI wordmark on same row, perfectly centered */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.55rem' }}>
               <img
                 src="/logo.png"
                 alt="RAVARI Logo"
                 className="ravari-logo-icon"
-                style={{ height: '38px', width: 'auto', opacity: 0.92, filter: 'drop-shadow(0 0 6px rgba(201,168,76,0.35))' }}
+                style={{ height: '36px', width: 'auto', opacity: 0.93, filter: 'drop-shadow(0 0 5px rgba(201,168,76,0.4))', flexShrink: 0 }}
               />
               <span className="ravari-wordmark" style={{
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                 fontSize: '2.5rem', fontWeight: 600,
                 letterSpacing: '0.55em', color: GOLD,
-                lineHeight: 1, paddingLeft: '0.55em',
+                lineHeight: 1, paddingLeft: '0.3em',
               }}>RAVARI</span>
             </div>
+
+            {/* Tagline — sits directly below RAVARI text, aligned to wordmark */}
             <span className="ravari-tagline" style={{
               fontFamily: 'Jost, sans-serif', fontSize: '0.5rem',
               fontWeight: 500, letterSpacing: '0.2em',
-              color: 'rgba(201,168,76,0.95)', textTransform: 'uppercase',
+              color: 'rgba(201,168,76,0.9)', textTransform: 'uppercase',
               whiteSpace: 'nowrap',
+              paddingLeft: '0.1em',
             }}>
               DURABLE &nbsp;|&nbsp; TEXTURED &nbsp;|&nbsp; FULL GRAIN &nbsp;|&nbsp; STITCHED &nbsp;|&nbsp; REINFORCED
             </span>
