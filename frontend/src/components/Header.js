@@ -105,20 +105,19 @@ export default function Header() {
               style={{ height: '38px', width: 'auto', opacity: 0.93, filter: 'drop-shadow(0 0 5px rgba(201,168,76,0.4))', flexShrink: 0 }}
             />
 
-            {/* RAVARI wordmark + tagline stacked */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '3px' }}>
+            {/* RAVARI wordmark + tagline stacked, tagline centered under wordmark */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
               <span className="ravari-wordmark" style={{
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                 fontSize: '2.5rem', fontWeight: 600,
                 letterSpacing: '0.55em', color: GOLD,
-                lineHeight: 1, paddingLeft: '0.3em',
+                lineHeight: 1, paddingLeft: '0.55em',
               }}>RAVARI</span>
               <span className="ravari-tagline" style={{
-                fontFamily: 'Jost, sans-serif', fontSize: '0.44rem',
-                fontWeight: 400, letterSpacing: '0.22em',
-                color: 'rgba(201,168,76,0.8)', textTransform: 'uppercase',
-                whiteSpace: 'nowrap', paddingLeft: '0.55em',
-                display: 'block', textAlign: 'center',
+                fontFamily: 'Jost, sans-serif', fontSize: '0.46rem',
+                fontWeight: 500, letterSpacing: '0.2em',
+                color: GOLD, textTransform: 'uppercase',
+                whiteSpace: 'nowrap', opacity: 0.7,
               }}>
                 DURABLE &nbsp;|&nbsp; TEXTURED &nbsp;|&nbsp; FULL GRAIN &nbsp;|&nbsp; STITCHED &nbsp;|&nbsp; REINFORCED
               </span>
