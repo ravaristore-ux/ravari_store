@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiPhone, FiMail, FiHome } from 'react-icons/fi';
+import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiHome } from 'react-icons/fi';
 
 const NAV = [
   { label: 'Home',       to: '/'         },
@@ -50,9 +50,7 @@ export default function Header() {
           margin: 0 auto;
           padding: 0 2rem;
         }
-        .hdr-contact { display: flex; align-items: center; gap: 1.4rem; }
-        .hdr-email   { display: flex; align-items: center; gap: 0.4rem; text-decoration: none; }
-        .hdr-phone   { display: flex; align-items: center; gap: 0.4rem; text-decoration: none; }
+        .hdr-left    { display: flex; align-items: center; }
         .hdr-icons   { display: flex; align-items: center; justify-content: flex-end; gap: 1.4rem; }
         .hdr-hamburger { display: none; }
         .hdr-nav { display: flex; }
@@ -64,7 +62,6 @@ export default function Header() {
             height: 60px;
             padding: 0 0.75rem;
           }
-          .hdr-contact { display: none !important; }
           .hdr-icons   { gap: 0.9rem; }
           .hdr-icons .hdr-search,
           .hdr-icons .hdr-wish  { display: none; }
@@ -87,64 +84,44 @@ export default function Header() {
       <div style={{ backgroundColor: TOP_BG, borderBottom: `1px solid ${BORDER}`, position: 'sticky', top: 0, zIndex: 200 }}>
         <div className="hdr-top">
 
-          {/* Left — hamburger (mobile) or contact (desktop) */}
-          <div>
-            {/* Hamburger — mobile only */}
+          {/* Left — hamburger (mobile only) */}
+          <div className="hdr-left">
             <button className="hdr-hamburger" onClick={() => setMenuOpen(o => !o)}
               style={{ ...iconStyle, display: 'none', padding: '4px' }}
               onMouseEnter={iconHover} onMouseLeave={iconLeave}>
               {menuOpen ? <FiX size={22} /> : <FiMenu size={22} />}
             </button>
-
-            {/* Contact — desktop only */}
-            <div className="hdr-contact">
-              <a href="tel:+919084260869" className="hdr-phone"
-                onMouseEnter={iconHover} onMouseLeave={iconLeave}>
-                <FiPhone size={14} style={{ color: GOLD, flexShrink: 0 }} />
-                <span style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.75rem', fontWeight: 500, letterSpacing: '0.05em', color: 'rgba(255,255,255,0.9)', whiteSpace: 'nowrap' }}>
-                  +91 90842 60869
-                </span>
-              </a>
-              <a href="mailto:ravari.store@gmail.com" className="hdr-email"
-                onMouseEnter={iconHover} onMouseLeave={iconLeave}>
-                <FiMail size={14} style={{ color: GOLD, flexShrink: 0 }} />
-                <span style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.75rem', fontWeight: 500, letterSpacing: '0.04em', color: 'rgba(255,255,255,0.9)', whiteSpace: 'nowrap' }}>
-                  ravari.store@gmail.com
-                </span>
-              </a>
-            </div>
           </div>
 
-          {/* Center — Logo + RAVARI + tagline */}
+          {/* Center — Logo + RAVARI + tagline (tagline only under wordmark) */}
           <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            style={{ textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            style={{ textAlign: 'center', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
 
-            {/* Logo icon + RAVARI wordmark on same row, perfectly centered */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.55rem' }}>
-              <img
-                src="/logo.png"
-                alt="RAVARI Logo"
-                className="ravari-logo-icon"
-                style={{ height: '36px', width: 'auto', opacity: 0.93, filter: 'drop-shadow(0 0 5px rgba(201,168,76,0.4))', flexShrink: 0 }}
-              />
+            {/* Logo icon — vertically centered with wordmark row */}
+            <img
+              src="/logo.png"
+              alt="RAVARI Logo"
+              className="ravari-logo-icon"
+              style={{ height: '38px', width: 'auto', opacity: 0.93, filter: 'drop-shadow(0 0 5px rgba(201,168,76,0.4))', flexShrink: 0 }}
+            />
+
+            {/* RAVARI wordmark + tagline stacked */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '3px' }}>
               <span className="ravari-wordmark" style={{
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                 fontSize: '2.5rem', fontWeight: 600,
                 letterSpacing: '0.55em', color: GOLD,
                 lineHeight: 1, paddingLeft: '0.3em',
               }}>RAVARI</span>
+              <span className="ravari-tagline" style={{
+                fontFamily: 'Jost, sans-serif', fontSize: '0.42rem',
+                fontWeight: 500, letterSpacing: '0.18em',
+                color: 'rgba(201,168,76,0.75)', textTransform: 'uppercase',
+                whiteSpace: 'nowrap', paddingLeft: '0.35em',
+              }}>
+                DURABLE &nbsp;·&nbsp; FULL GRAIN &nbsp;·&nbsp; HANDSTITCHED
+              </span>
             </div>
-
-            {/* Tagline — sits directly below RAVARI text, aligned to wordmark */}
-            <span className="ravari-tagline" style={{
-              fontFamily: 'Jost, sans-serif', fontSize: '0.5rem',
-              fontWeight: 500, letterSpacing: '0.2em',
-              color: 'rgba(201,168,76,0.9)', textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-              paddingLeft: '0.1em',
-            }}>
-              DURABLE &nbsp;|&nbsp; TEXTURED &nbsp;|&nbsp; FULL GRAIN &nbsp;|&nbsp; STITCHED &nbsp;|&nbsp; REINFORCED
-            </span>
           </Link>
 
           {/* Right — icons */}
