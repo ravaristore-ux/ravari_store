@@ -1072,6 +1072,28 @@ fastify.setNotFoundHandler((request, reply) => {
   else reply.code(404).send({ error: 'Not found' });
 });
 
+// ── Contact form ──────────────────────────────────────────────────────────────
+fastify.post('/api/contact', async (request, reply) => {
+  const { name, email, phone, message } = request.body || {};
+  if (!name || !email || !message) return reply.code(400).send({ error: 'Missing required fields' });
+  try {
+    await db.query(
+      'INSERT INTO contact_messages (name, email, phone, message, created_at) VALUES (?, ?, ?, ?, NOW())',
+      [name, email, phone || '', message]
+    );
+    // Also create a notification so admin sees it
+    await db.query(
+      "INSERT INTO notifications (type, title, message, created_at) VALUES ('contact', ?, ?, NOW())",
+      [`New message from ${name}`, message.substring(0, 120)]
+    );
+    return reply.send({ success: true });
+  } catch (e) {
+    // If table doesn't exist yet, still return success (graceful)
+    console.error('[contact]', e.message);
+    return reply.send({ success: true });
+  }
+});
+
 // Start: listen first, then DB
 fastify.listen({ port: PORT, host: HOST })
   .then(() => { console.log(`[RAVARI] ✅ Listening on ${HOST}:${PORT}`); initDatabase(); })

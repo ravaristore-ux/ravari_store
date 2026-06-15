@@ -1,56 +1,35 @@
-const initialState = {
-  items: localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : [],
-  total: 0
-};
+const load = () => { try { return JSON.parse(localStorage.getItem('ravari_cart') || '[]'); } catch { return []; } };
+const save = items => { try { localStorage.setItem('ravari_cart', JSON.stringify(items)); } catch {} };
+
+const initialState = { items: load(), total: 0 };
 
 const cartReducer = (state = initialState, action) => {
+  let items;
   switch (action.type) {
     case 'ADD_TO_CART':
-      const existingItem = state.items.find(item => item.productId === action.payload.productId && item.selectedOptions === action.payload.selectedOptions);
-
-      if (existingItem) {
-        return {
-          ...state,
-          items: state.items.map(item =>
-            item.productId === action.payload.productId
-              ? { ...item, quantity: item.quantity + action.payload.quantity }
-              : item
-          )
-        };
-      }
-
-      return {
-        ...state,
-        items: [...state.items, action.payload]
-      };
+      const existing = state.items.find(i => i.productId === action.payload.productId);
+      items = existing
+        ? state.items.map(i => i.productId === action.payload.productId ? { ...i, quantity: i.quantity + action.payload.quantity } : i)
+        : [...state.items, action.payload];
+      save(items);
+      return { ...state, items };
 
     case 'REMOVE_FROM_CART':
-      return {
-        ...state,
-        items: state.items.filter(item => item.productId !== action.payload)
-      };
+      items = state.items.filter(i => i.productId !== action.payload);
+      save(items);
+      return { ...state, items };
 
     case 'UPDATE_QUANTITY':
-      return {
-        ...state,
-        items: state.items.map(item =>
-          item.productId === action.payload.productId
-            ? { ...item, quantity: action.payload.quantity }
-            : item
-        ).filter(item => item.quantity > 0)
-      };
+      items = state.items.map(i => i.productId === action.payload.productId ? { ...i, quantity: action.payload.quantity } : i).filter(i => i.quantity > 0);
+      save(items);
+      return { ...state, items };
 
     case 'CLEAR_CART':
-      return {
-        items: [],
-        total: 0
-      };
+      save([]);
+      return { items: [], total: 0 };
 
     case 'SET_CART_TOTAL':
-      return {
-        ...state,
-        total: action.payload
-      };
+      return { ...state, total: action.payload };
 
     default:
       return state;

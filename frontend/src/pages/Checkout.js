@@ -276,6 +276,17 @@ export default function Checkout() {
                 <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', fontWeight: 600, color: GOLD }}>₹{total.toLocaleString('en-IN')}</span>
               </div>
               {shipping === 0 && <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.6rem', color: '#C9A84C', marginTop: '0.5rem', textAlign: 'right' }}>✓ Free shipping applied</p>}
+
+              {/* Payment trust logos */}
+              <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #E8E4DE' }}>
+                <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.55rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#B0A89E', textAlign: 'center', marginBottom: '0.75rem' }}>Secure & Trusted Payments</p>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+                  {['UPI', 'Visa', 'Mastercard', 'RuPay', 'Net Banking'].map(m => (
+                    <span key={m} style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.55rem', fontWeight: 600, letterSpacing: '0.05em', color: '#6B6560', border: '1px solid #E0DBD4', padding: '3px 8px', borderRadius: '3px', backgroundColor: '#FAFAF8' }}>{m}</span>
+                  ))}
+                </div>
+                <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.58rem', color: '#B0A89E', textAlign: 'center', marginTop: '0.6rem' }}>🔒 256-bit SSL · Powered by Razorpay</p>
+              </div>
             </div>
           </div>
         </div>

@@ -4,10 +4,13 @@ import SEO from '../components/SEO';
 import { SEO_CONFIG } from '../utils/seoConstants';
 import { getOrganizationSchema, getLocalBusinessSchema } from '../utils/schemaMarkup';
 import { trackPageView, trackFormSubmission } from '../utils/ga4Tracking';
+import api from '../api/axiosConfig';
 
 function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [sending,   setSending]   = useState(false);
+  const [sendError, setSendError] = useState('');
 
   // Track page view
   useEffect(() => {
@@ -29,12 +32,20 @@ function Contact() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    trackFormSubmission('contact');
-    setSubmitted(true);
-    setTimeout(() => setSubmitted(false), 3000);
-    setFormData({ name: '', email: '', phone: '', message: '' });
+    setSending(true); setSendError('');
+    try {
+      await api.post('/contact', formData);
+      trackFormSubmission('contact');
+      setSubmitted(true);
+      setFormData({ name: '', email: '', phone: '', message: '' });
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch {
+      setSendError('Could not send message. Please WhatsApp or email us directly.');
+    } finally {
+      setSending(false);
+    }
   };
 
   const whatsappNumber = '+919084260869';
@@ -119,11 +130,15 @@ function Contact() {
                   required
                 ></textarea>
               </div>
+              {sendError && (
+                <div className="bg-red-50 border-2 border-red-300 text-red-700 px-4 py-3 rounded-lg text-sm font-semibold">{sendError}</div>
+              )}
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white py-4 rounded-lg font-black text-lg hover:shadow-2xl transition transform hover:scale-105"
+                disabled={sending}
+                className="w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white py-4 rounded-lg font-black text-lg hover:shadow-2xl transition transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                ✉️ Send Message
+                {sending ? 'Sending…' : '✉️ Send Message'}
               </button>
             </form>
           </div>
@@ -209,7 +224,7 @@ function Contact() {
           <h2 className="text-4xl font-black text-gray-900 mb-8 text-center">Frequently Asked Questions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {[
-              { q: 'What is your return policy?', a: 'We offer 10-day returns on all products in original condition with all tags attached.' },
+              { q: 'What is your return policy?', a: 'We offer 7-day hassle-free returns on all products in original condition with all tags and packaging intact.' },
               { q: 'Do you ship internationally?', a: 'Yes, we ship to most countries worldwide. Shipping rates vary by location.' },
               { q: 'How do I care for my RAVARI product?', a: 'Each product comes with detailed care instructions. Generally, condition leather regularly and store in dust bag.' },
               { q: 'Can I customize my order?', a: 'Yes! We offer custom personalization services. Please contact us for details.' }

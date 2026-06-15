@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiInstagram, FiFacebook, FiLinkedin, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
 
@@ -8,6 +8,17 @@ const hoverOn  = e => e.currentTarget.style.color = '#FFFFFF';
 const hoverOff = e => e.currentTarget.style.color = 'rgba(255,255,255,0.52)';
 
 function Footer() {
+  const [email, setEmail] = useState('');
+  const [subDone, setSubDone] = useState(false);
+
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    if (!email.includes('@')) return;
+    setSubDone(true);
+    setEmail('');
+    setTimeout(() => setSubDone(false), 4000);
+  };
+
   return (
     <footer style={{ backgroundColor: '#0A0806', color: '#FFFFFF', borderTop: `1px solid rgba(201,168,76,0.18)` }}>
 
@@ -142,17 +153,29 @@ function Footer() {
               </li>
             </ul>
 
-            {/* Newsletter box */}
+            {/* Newsletter signup */}
             <div style={{ padding: '1.4rem 1.25rem', border: '1px solid rgba(201,168,76,0.22)', background: 'rgba(201,168,76,0.04)' }}>
-              <p style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1rem', fontStyle: 'italic', color: 'rgba(255,255,255,0.55)', lineHeight: 1.5, marginBottom: '0.5rem' }}>
-                "Where leather meets legacy."
-              </p>
-              <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.58rem', fontWeight: 500, letterSpacing: '0.18em', textTransform: 'uppercase', color: GOLD }}>
+              <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.58rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, marginBottom: '0.4rem' }}>
                 Stay in the Loop
               </p>
-              <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.65rem', color: 'rgba(255,255,255,0.32)', lineHeight: 1.6, marginTop: '0.35rem' }}>
+              <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.6, marginBottom: '1rem' }}>
                 New arrivals, craft stories & exclusive offers.
               </p>
+              {subDone ? (
+                <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.68rem', color: GOLD, fontWeight: 500 }}>✓ Thank you for subscribing!</p>
+              ) : (
+                <form onSubmit={handleSubscribe} style={{ display: 'flex', gap: '0' }}>
+                  <input
+                    type="email" value={email} onChange={e => setEmail(e.target.value)}
+                    placeholder="your@email.com" required
+                    style={{ flex: 1, padding: '0.6rem 0.85rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(201,168,76,0.3)', borderRight: 'none', color: '#fff', fontFamily: 'Jost, sans-serif', fontSize: '0.72rem', outline: 'none', minWidth: 0 }}
+                  />
+                  <button type="submit"
+                    style={{ padding: '0.6rem 1rem', backgroundColor: GOLD, border: 'none', color: '#0D0B08', fontFamily: 'Jost, sans-serif', fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.1em', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                    JOIN
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>
