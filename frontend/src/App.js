@@ -1,11 +1,5 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
-  return null;
-}
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import Header from './components/Header';
@@ -28,6 +22,12 @@ import AdminLogin from './pages/AdminLogin';
 import Login from './pages/Login';
 import WhatsAppButton from './components/WhatsAppButton';
 import './styles/globals.css';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
 
 function MainLayout() {
   return (
