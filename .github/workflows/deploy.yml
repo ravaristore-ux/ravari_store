@@ -27,7 +27,7 @@ jobs:
         npm install
         CI=false npm run build
 
-    - name: Upload build contents directly into build folder
+    - name: Upload frontend build
       run: |
         for i in 1 2 3; do
           echo "=== Upload attempt $i ==="
@@ -37,7 +37,7 @@ jobs:
             -P 65002 \
             -r frontend/build/. \
             "$HOSTINGER_USER@$HOSTINGER_HOST:/home/$HOSTINGER_USER/nodejs/frontend/build/" \
-          && echo "Upload succeeded!" && break \
+          && echo "Frontend upload succeeded!" && break \
           || { echo "Attempt $i failed, retrying in 20s..."; sleep 20; }
         done
       env:
@@ -45,7 +45,25 @@ jobs:
         HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
         HOSTINGER_PASSWORD: ${{ secrets.HOSTINGER_PASSWORD }}
 
-    - name: Verify correct files are on server
+    - name: Upload backend files
+      run: |
+        for i in 1 2 3; do
+          echo "=== Backend upload attempt $i ==="
+          sshpass -p "$HOSTINGER_PASSWORD" scp \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=30 \
+            -P 65002 \
+            backend/server.js backend/package.json \
+            "$HOSTINGER_USER@$HOSTINGER_HOST:/home/$HOSTINGER_USER/nodejs/backend/" \
+          && echo "Backend upload succeeded!" && break \
+          || { echo "Attempt $i failed, retrying in 20s..."; sleep 20; }
+        done
+      env:
+        HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
+        HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
+        HOSTINGER_PASSWORD: ${{ secrets.HOSTINGER_PASSWORD }}
+
+    - name: Install backend dependencies
       run: |
         for i in 1 2 3; do
           sshpass -p "$HOSTINGER_PASSWORD" ssh \
@@ -53,7 +71,7 @@ jobs:
             -o ConnectTimeout=30 \
             -p 65002 \
             "$HOSTINGER_USER@$HOSTINGER_HOST" \
-            "echo '=== index.html ===' && ls -la /home/$HOSTINGER_USER/nodejs/frontend/build/index.html && echo '=== CSS files ===' && ls /home/$HOSTINGER_USER/nodejs/frontend/build/static/css/ && echo '=== Check luxury CSS ===' && grep -c 'espresso\|btn-primary\|Playfair' /home/$HOSTINGER_USER/nodejs/frontend/build/static/css/*.css && echo 'Luxury CSS confirmed!'" \
+            "source ~/.nvm/nvm.sh 2>/dev/null; cd /home/$HOSTINGER_USER/nodejs/backend && npm install --production 2>&1 | tail -5 && echo 'npm install done'" \
           && break \
           || { echo "Attempt $i failed, retrying in 20s..."; sleep 20; }
         done
