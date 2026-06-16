@@ -1,5 +1,11 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import Header from './components/Header';
@@ -26,6 +32,7 @@ import './styles/globals.css';
 function MainLayout() {
   return (
     <div className="flex flex-col min-h-screen bg-white">
+      <ScrollToTop />
       <Header />
       <main className="flex-grow">
         <Routes>
