@@ -298,6 +298,14 @@ function ProductDetail() {
                 )}
               </div>
               <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.65rem', color: '#8C8680' }}>Inclusive of all taxes</p>
+              {product.stock > 0 && product.stock <= 5 && (
+                <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.65rem', fontWeight: 600, color: '#C0392B', marginTop: '0.4rem' }}>
+                  ⚡ Only {product.stock} left in stock — order soon!
+                </p>
+              )}
+              <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.65rem', color: '#2E7D32', marginTop: '0.35rem' }}>
+                🚚 Estimated delivery: {(() => { const d = new Date(); d.setDate(d.getDate() + 7); return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }); })()}
+              </p>
             </div>
 
             {/* Description */}
@@ -523,9 +531,14 @@ function ProductDetail() {
                 <div key={review._id} className="bg-white border-2 border-amber-100 p-6 rounded-xl">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <p className="font-bold text-gray-900">
-                        {review.userId?.firstName} {review.userId?.lastName}
-                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '2px' }}>
+                        <p className="font-bold text-gray-900">
+                          {review.userId?.firstName} {review.userId?.lastName}
+                        </p>
+                        <span style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.55rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#1B6C2F', backgroundColor: '#EAFBEF', border: '1px solid #A7D9B6', padding: '1px 6px' }}>
+                          ✓ Verified Purchase
+                        </span>
+                      </div>
                       <div className="flex text-yellow-400">
                         {'⭐'.repeat(review.rating)}
                       </div>

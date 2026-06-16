@@ -112,6 +112,12 @@ function ProductCard({ product, onAddToCart, onToggleWishlist, isInWishlist }) {
           </div>
         )}
 
+        {product.stock > 0 && product.stock <= 5 && (
+          <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.58rem', fontWeight: 600, color: '#C0392B', marginBottom: '0.4rem', letterSpacing: '0.04em' }}>
+            ⚡ Only {product.stock} left
+          </p>
+        )}
+
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-2">
             <span style={{ fontFamily: 'Playfair Display, Georgia, serif', fontSize: '1.1rem', fontWeight: 600, color: '#1A0F0A' }}>

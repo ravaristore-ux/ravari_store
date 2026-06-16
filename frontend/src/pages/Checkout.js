@@ -32,7 +32,7 @@ export default function Checkout() {
     firstName: '', lastName: '', email: user?.email || '',
     phone: '', street: '', city: '', state: '',
     postalCode: '', country: 'India',
-    paymentMethod: 'razorpay', orderNotes: '',
+    paymentMethod: 'razorpay', orderNotes: '', giftWrap: false,
   });
 
   useEffect(() => {
@@ -53,7 +53,8 @@ export default function Checkout() {
       : Math.min(coupon.discountValue, subtotal)
     : 0;
   const shipping = subtotal > 5000 ? 0 : 100;
-  const total    = subtotal - discount + shipping;
+  const giftWrapFee = form.giftWrap ? 49 : 0;
+  const total    = subtotal - discount + shipping + giftWrapFee;
 
   const set = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
 
@@ -198,6 +199,15 @@ export default function Checkout() {
                         onBlur={e => e.target.style.borderColor = '#E0DBD4'} />
                     ))}
                   </div>
+                  {/* Gift wrap */}
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginTop: '1rem', padding: '0.85rem 1rem', border: `1.5px solid ${form.giftWrap ? GOLD : '#E0DBD4'}`, cursor: 'pointer', backgroundColor: form.giftWrap ? '#FDFBF6' : '#FFF', transition: 'border-color 0.2s' }}>
+                    <input type="checkbox" checked={form.giftWrap} onChange={e => setForm(f => ({ ...f, giftWrap: e.target.checked }))} style={{ accentColor: GOLD, marginTop: '2px', flexShrink: 0 }} />
+                    <div>
+                      <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.75rem', fontWeight: 600, color: '#0D0D0D' }}>🎁 Gift Wrap — ₹49</p>
+                      <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.65rem', color: '#8C8680', marginTop: '2px' }}>Premium tissue wrap with a RAVARI ribbon. Add a personalised note in Order Instructions below.</p>
+                    </div>
+                  </label>
+
                   {/* Order notes */}
                   <div style={{ marginTop: '0.85rem' }}>
                     <textarea name="orderNotes" value={form.orderNotes} onChange={set} rows={2}
@@ -278,6 +288,7 @@ export default function Checkout() {
               {[
                 { label: 'Subtotal',  val: `₹${subtotal.toLocaleString('en-IN')}` },
                 { label: 'Shipping',  val: shipping === 0 ? 'FREE' : `₹${shipping}` },
+                ...(giftWrapFee > 0 ? [{ label: 'Gift Wrap', val: '₹49' }] : []),
               ].map(r => (
                 <div key={r.label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
                   <span style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.72rem', color: '#4A4642' }}>{r.label}</span>

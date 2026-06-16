@@ -113,7 +113,7 @@ export default function OrderConfirmation() {
                   <div style={{ borderTop: '1px solid #E8E4DE', marginTop: '1rem', paddingTop: '1rem' }}>
                     {[
                       { label: 'Subtotal', val: `₹${Number(order.subtotal || 0).toLocaleString('en-IN')}` },
-                      { label: 'Shipping', val: Number(order.subtotal || 0) >= 5000 ? 'FREE' : '₹200' },
+                      { label: 'Shipping', val: Number(order.subtotal || 0) >= 5000 ? 'FREE' : '₹100' },
                       ...(Number(order.discount) > 0 ? [{ label: `Discount`, val: `−₹${Number(order.discount).toLocaleString('en-IN')}`, green: true }] : []),
                     ].map(({ label, val, green }) => (
                       <div key={label} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: green ? '#16A34A' : '#6B6560', marginBottom: '0.35rem' }}>
@@ -167,6 +167,21 @@ export default function OrderConfirmation() {
                 Initiate Return
               </Link>
             </div>
+
+            {/* Cancel order */}
+            {order && (order.status === 'pending' || order.status === 'cod_pending') && (
+              <div style={{ backgroundColor: '#fff', border: '1px solid #E8E4DE', padding: '1.25rem 1.5rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <p style={{ fontSize: '0.72rem', fontWeight: 600, color: DARK }}>Need to cancel?</p>
+                  <p style={{ fontSize: '0.62rem', color: '#6B6560', marginTop: '2px' }}>You can cancel within 1 hour of placing the order. Contact us on WhatsApp.</p>
+                </div>
+                <a href={`https://wa.me/919084260869?text=Hi%20RAVARI%2C%20I%20want%20to%20cancel%20my%20order%20${orderId}`}
+                  target="_blank" rel="noreferrer"
+                  style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.62rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: '#C0392B', backgroundColor: 'transparent', border: '1px solid #C0392B', padding: '0.5rem 1.25rem', textDecoration: 'none', whiteSpace: 'nowrap' }}>
+                  Cancel Order
+                </a>
+              </div>
+            )}
 
             {/* CTA buttons */}
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>

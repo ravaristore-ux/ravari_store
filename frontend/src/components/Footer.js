@@ -156,13 +156,13 @@ function Footer() {
             {/* Newsletter signup */}
             <div style={{ padding: '1.4rem 1.25rem', border: '1px solid rgba(201,168,76,0.22)', background: 'rgba(201,168,76,0.04)' }}>
               <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.58rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, marginBottom: '0.4rem' }}>
-                Stay in the Loop
+                Get 10% Off Your First Order
               </p>
               <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.6, marginBottom: '1rem' }}>
-                New arrivals, craft stories & exclusive offers.
+                Subscribe for exclusive offers, new arrivals & craft stories.
               </p>
               {subDone ? (
-                <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.68rem', color: GOLD, fontWeight: 500 }}>✓ Thank you for subscribing!</p>
+                <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.68rem', color: GOLD, fontWeight: 500 }}>✓ Check your email for your 10% off code!</p>
               ) : (
                 <form onSubmit={handleSubscribe} style={{ display: 'flex', gap: '0' }}>
                   <input
@@ -178,6 +178,14 @@ function Footer() {
               )}
             </div>
           </div>
+        </div>
+
+        {/* ── Payment logos ── */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '1.5rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <span style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.55rem', color: 'rgba(255,255,255,0.22)', letterSpacing: '0.1em', textTransform: 'uppercase', marginRight: '0.5rem' }}>Secure payments via</span>
+          {['UPI', 'Visa', 'Mastercard', 'RuPay', 'Net Banking', 'Razorpay'].map(m => (
+            <span key={m} style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.55rem', fontWeight: 600, color: 'rgba(255,255,255,0.35)', border: '1px solid rgba(255,255,255,0.1)', padding: '3px 8px', borderRadius: '3px', letterSpacing: '0.04em' }}>{m}</span>
+          ))}
         </div>
 
         {/* ── Bottom bar ── */}
