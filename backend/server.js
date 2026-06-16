@@ -786,12 +786,14 @@ fastify.post('/api/orders', async (request, reply) => {
     try {
       const r = await query('INSERT INTO orders (customerName,customerEmail,customerPhone,address,items,subtotal,discount,total,couponCode,paymentMethod,status) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
         [b.customerName, b.customerEmail, b.customerPhone, b.address, JSON.stringify(b.items || []), b.subtotal || 0, b.discount || 0, b.total || 0, b.couponCode || null, b.paymentMethod || 'razorpay', 'pending']);
-      // Auto-create notification for new order
+      const orderId = r.insertId;
       try {
         await query("INSERT INTO notifications (type,title,message,orderId) VALUES (?,?,?,?)",
-          ['new_order', 'New Order Received', `Order #${r.insertId} from ${b.customerName} — ₹${b.total}`, String(r.insertId)]);
+          ['new_order', 'New Order Received', `Order #${orderId} from ${b.customerName} — ₹${b.total}`, String(orderId)]);
       } catch(_) {}
-      return { success: true, orderId: r.insertId };
+      // Send confirmation emails (non-blocking)
+      sendOrderEmails(orderId, b, 'Online Payment').catch(e => console.error('[order email]', e.message));
+      return { success: true, orderId };
     } catch (e) { reply.code(500); return { error: e.message }; }
   }
   return { success: true, orderId: null };
@@ -990,7 +992,9 @@ fastify.post('/api/orders/cod', async (request, reply) => {
         [b.customerName, b.customerEmail, b.customerPhone, b.address,
          JSON.stringify(b.items || []), b.subtotal || 0, b.discount || 0, b.total || 0,
          b.couponCode || null, 'cod', 'cod_pending']);
-      return { success: true, orderId: `RAV${r.insertId}`, method: 'cod' };
+      const orderId = r.insertId;
+      sendOrderEmails(orderId, b, 'Cash on Delivery').catch(e => console.error('[cod email]', e.message));
+      return { success: true, orderId: `RAV${orderId}`, method: 'cod' };
     } catch (e) { reply.code(500); return { error: e.message }; }
   }
   return { success: true, orderId: `RAV${Date.now()}`, method: 'cod' };
@@ -1072,6 +1076,94 @@ fastify.setNotFoundHandler((request, reply) => {
   if (fs.existsSync(indexPath)) reply.type('text/html').header('Cache-Control', 'no-cache').send(fs.readFileSync(indexPath));
   else reply.code(404).send({ error: 'Not found' });
 });
+
+// ── Order confirmation emails ─────────────────────────────────────────────────
+async function sendOrderEmails(orderId, b, paymentLabel) {
+  const items = b.items || [];
+  const shipping = Number(b.shipping || 0);
+  const discount = Number(b.discount || 0);
+  const subtotal = Number(b.subtotal || 0);
+  const total    = Number(b.total    || 0);
+
+  const itemsHtml = items.map(i => `
+    <tr>
+      <td style="padding:10px 0;border-bottom:1px solid #f0ede8;font-size:14px;color:#333;">
+        ${i.image ? `<img src="${i.image}" width="44" height="44" style="object-fit:contain;vertical-align:middle;margin-right:10px;border:1px solid #eee;">` : ''}
+        ${i.name}
+      </td>
+      <td style="padding:10px 0;border-bottom:1px solid #f0ede8;font-size:14px;color:#333;text-align:center;">${i.quantity || 1}</td>
+      <td style="padding:10px 0;border-bottom:1px solid #f0ede8;font-size:14px;color:#333;text-align:right;">₹${(Number(i.price) * (i.quantity || 1)).toLocaleString('en-IN')}</td>
+    </tr>`).join('');
+
+  const orderHtml = (forAdmin) => `
+    <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e0d8cc;">
+      <div style="background:#0D0B08;padding:24px 28px;text-align:center;">
+        <h1 style="font-family:Georgia,serif;color:#C9A84C;font-size:26px;letter-spacing:6px;margin:0;">RAVARI</h1>
+        <p style="color:rgba(255,255,255,0.55);font-size:11px;margin:6px 0 0;letter-spacing:2px;text-transform:uppercase;">
+          ${forAdmin ? 'New Order Received' : 'Order Confirmed'}
+        </p>
+      </div>
+      <div style="padding:28px;">
+        ${!forAdmin ? `<p style="font-size:16px;color:#333;margin-bottom:6px;">Hi <strong>${b.customerName}</strong>,</p>
+        <p style="font-size:14px;color:#555;line-height:1.6;margin-bottom:20px;">
+          Thank you for your order! We've received it and will begin processing shortly.
+          ${paymentLabel === 'Cash on Delivery' ? 'Please keep <strong>₹' + total.toLocaleString('en-IN') + '</strong> ready at the time of delivery.' : ''}
+        </p>` : ''}
+        <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+          <tr>
+            <td style="font-size:12px;color:#888;padding-bottom:6px;text-transform:uppercase;letter-spacing:1px;">Order ID</td>
+            <td style="font-size:12px;color:#888;padding-bottom:6px;text-transform:uppercase;letter-spacing:1px;text-align:center;">Qty</td>
+            <td style="font-size:12px;color:#888;padding-bottom:6px;text-transform:uppercase;letter-spacing:1px;text-align:right;">Amount</td>
+          </tr>
+          ${itemsHtml}
+        </table>
+        <table style="width:100%;font-size:14px;color:#555;border-collapse:collapse;margin-bottom:20px;">
+          <tr><td style="padding:4px 0;">Subtotal</td><td style="text-align:right;">₹${subtotal.toLocaleString('en-IN')}</td></tr>
+          ${discount > 0 ? `<tr><td style="padding:4px 0;color:#16A34A;">Discount</td><td style="text-align:right;color:#16A34A;">−₹${discount.toLocaleString('en-IN')}</td></tr>` : ''}
+          <tr><td style="padding:4px 0;">Shipping</td><td style="text-align:right;">${shipping === 0 ? 'FREE' : '₹' + shipping.toLocaleString('en-IN')}</td></tr>
+          <tr style="border-top:2px solid #e0d8cc;">
+            <td style="padding:10px 0 4px;font-weight:bold;font-size:16px;color:#0D0B08;">Total</td>
+            <td style="text-align:right;font-weight:bold;font-size:16px;color:#C9A84C;padding:10px 0 4px;">₹${total.toLocaleString('en-IN')}</td>
+          </tr>
+        </table>
+        <div style="background:#f8f5ef;border-left:3px solid #C9A84C;padding:14px 16px;margin-bottom:20px;">
+          <p style="font-size:12px;color:#888;margin:0 0 4px;text-transform:uppercase;letter-spacing:1px;">Delivery Address</p>
+          <p style="font-size:14px;color:#333;margin:0;line-height:1.6;">${b.customerName}<br>${b.address}</p>
+        </div>
+        <table style="width:100%;font-size:13px;color:#555;border-collapse:collapse;">
+          <tr><td style="padding:3px 0;color:#888;width:120px;">Order ID</td><td><strong>RAV${orderId}</strong></td></tr>
+          <tr><td style="padding:3px 0;color:#888;">Payment</td><td>${paymentLabel}</td></tr>
+          ${b.customerPhone ? `<tr><td style="padding:3px 0;color:#888;">Phone</td><td>${b.customerPhone}</td></tr>` : ''}
+          ${b.customerEmail ? `<tr><td style="padding:3px 0;color:#888;">Email</td><td>${b.customerEmail}</td></tr>` : ''}
+        </table>
+      </div>
+      <div style="background:#f9f7f4;padding:16px 28px;border-top:1px solid #eee;text-align:center;">
+        ${!forAdmin ? `<p style="font-size:13px;color:#555;margin:0 0 8px;">Need help? WhatsApp us at <a href="https://wa.me/919084260869" style="color:#C9A84C;">+91 90842 60869</a></p>` : ''}
+        <p style="font-size:11px;color:#aaa;margin:0;">RAVARI · Lucknow, India · ravari.store@gmail.com</p>
+      </div>
+    </div>`;
+
+  const ADMIN = process.env.GMAIL_USER || 'ravari.store@gmail.com';
+
+  // Email to admin
+  await mailer.sendMail({
+    from: `"RAVARI Orders" <${ADMIN}>`,
+    to: ADMIN,
+    subject: `🛒 New Order RAV${orderId} — ₹${total.toLocaleString('en-IN')} — ${b.customerName}`,
+    html: orderHtml(true),
+  });
+
+  // Email to customer (only if they provided an email)
+  if (b.customerEmail && b.customerEmail.includes('@')) {
+    await mailer.sendMail({
+      from: `"RAVARI" <${ADMIN}>`,
+      to: b.customerEmail,
+      replyTo: ADMIN,
+      subject: `Order Confirmed — RAV${orderId} | RAVARI`,
+      html: orderHtml(false),
+    });
+  }
+}
 
 // ── Contact form ──────────────────────────────────────────────────────────────
 const mailer = nodemailer.createTransport({
