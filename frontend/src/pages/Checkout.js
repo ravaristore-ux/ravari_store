@@ -64,6 +64,12 @@ export default function Checkout() {
   /* ── Razorpay ── */
   async function payWithRazorpay() {
     setLoading(true); setError('');
+    // Ensure Razorpay SDK is loaded
+    if (!window.Razorpay) {
+      setError('Payment gateway is loading, please wait a moment and try again.');
+      setLoading(false);
+      return;
+    }
     try {
       const { data } = await api.post('/payment/razorpay/create', { amount: total, receipt: `rcpt_${Date.now()}` });
       if (!data.order) throw new Error(data.error || 'Could not create payment order');
@@ -77,19 +83,20 @@ export default function Checkout() {
         order_id:    data.order.id,
         prefill:     { name: `${form.firstName} ${form.lastName}`, email: form.email, contact: form.phone },
         theme:       { color: GOLD },
-        handler: async (response) => {
-          try {
-            const v = await api.post('/payment/razorpay/verify', response);
-            if (v.data.success) await placeOrder('razorpay', response.razorpay_payment_id);
-            else { setError('Payment verification failed. Please contact support.'); setLoading(false); }
-          } catch { setError('Verification error. Please contact support.'); setLoading(false); }
+        handler: function(response) {
+          api.post('/payment/razorpay/verify', response)
+            .then(v => {
+              if (v.data.success) placeOrder('razorpay', response.razorpay_payment_id);
+              else { setError('Payment verification failed. Please contact support.'); setLoading(false); }
+            })
+            .catch(() => { setError('Verification error. Please contact support.'); setLoading(false); });
         },
         modal: { ondismiss: () => setLoading(false) },
       };
       const rzp = new window.Razorpay(options);
       rzp.open();
     } catch (e) {
-      setError(e.response?.data?.error || e.message || 'Payment failed');
+      setError(e.response?.data?.error || e.message || 'Payment failed. Please try again.');
       setLoading(false);
     }
   }

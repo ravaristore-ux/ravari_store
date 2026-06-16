@@ -94,35 +94,35 @@ export default function Header() {
             </button>
           </div>
 
-          {/* Center — Logo + RAVARI + tagline (tagline only under wordmark) */}
+          {/* Center — Logo + RAVARI + tagline */}
           <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            style={{ textAlign: 'center', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
+            style={{ textAlign: 'center', textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
 
-            {/* Logo icon — vertically centered with wordmark row */}
-            <img
-              src="/logo.png"
-              alt="RAVARI Logo"
-              className="ravari-logo-icon"
-              style={{ height: '38px', width: 'auto', opacity: 0.93, filter: 'drop-shadow(0 0 5px rgba(201,168,76,0.4))', flexShrink: 0 }}
-            />
-
-            {/* RAVARI wordmark + tagline stacked */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+            {/* Top row: logo icon + RAVARI wordmark side by side */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
+              <img
+                src="/logo.png"
+                alt="RAVARI Logo"
+                className="ravari-logo-icon"
+                style={{ height: '38px', width: 'auto', opacity: 0.93, filter: 'drop-shadow(0 0 5px rgba(201,168,76,0.4))', flexShrink: 0 }}
+              />
               <span className="ravari-wordmark" style={{
                 fontFamily: 'Cormorant Garamond, Georgia, serif',
                 fontSize: '2.5rem', fontWeight: 600,
                 letterSpacing: '0.55em', color: GOLD,
                 lineHeight: 1, paddingLeft: '0.55em',
               }}>RAVARI</span>
-              <span className="ravari-tagline" style={{
-                fontFamily: 'Jost, sans-serif', fontSize: '0.45rem',
-                fontWeight: 500, letterSpacing: '0.22em',
-                color: GOLD, opacity: 0.85, textTransform: 'uppercase',
-                whiteSpace: 'nowrap', paddingLeft: '0.22em',
-              }}>
-                DURABLE &nbsp;|&nbsp; TEXTURED &nbsp;|&nbsp; FULL GRAIN &nbsp;|&nbsp; STITCHED &nbsp;|&nbsp; REINFORCED
-              </span>
             </div>
+
+            {/* Tagline directly below RAVARI */}
+            <span className="ravari-tagline" style={{
+              fontFamily: 'Jost, sans-serif', fontSize: '0.45rem',
+              fontWeight: 500, letterSpacing: '0.22em',
+              color: GOLD, opacity: 0.85, textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+            }}>
+              DURABLE &nbsp;|&nbsp; TEXTURED &nbsp;|&nbsp; FULL GRAIN &nbsp;|&nbsp; STITCHED &nbsp;|&nbsp; REINFORCED
+            </span>
           </Link>
 
           {/* Right — icons */}

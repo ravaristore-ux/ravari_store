@@ -18,6 +18,15 @@ try { fs.mkdirSync(uploadsDir, { recursive: true }); } catch (_) {}
 
 console.log(`[RAVARI] Starting server on ${HOST}:${PORT}`);
 
+// Mailer — defined early so it's available for all email functions
+const nodemailerInstance = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER || 'ravari.store@gmail.com',
+    pass: process.env.GMAIL_APP_PASS || '',
+  },
+});
+
 // ---------------------------------------------------------------------------
 // Product catalogue (rich shape used by the full React frontend)
 // ---------------------------------------------------------------------------
@@ -1166,13 +1175,7 @@ async function sendOrderEmails(orderId, b, paymentLabel) {
 }
 
 // ── Contact form ──────────────────────────────────────────────────────────────
-const mailer = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER || 'ravari.store@gmail.com',
-    pass: process.env.GMAIL_APP_PASS || '',
-  },
-});
+const mailer = nodemailerInstance; // alias — defined at top of file
 
 fastify.post('/api/contact', async (request, reply) => {
   const { name, email, phone, message } = request.body || {};
