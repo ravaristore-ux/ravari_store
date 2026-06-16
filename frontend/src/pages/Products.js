@@ -73,6 +73,16 @@ function Products() {
         canonical={`${SEO_CONFIG.site.url}/products`}
       />
 
+      {/* Breadcrumb */}
+      <div style={{ backgroundColor: '#F8F7F5', borderBottom: '1px solid #E8E4DE', padding: '0.55rem 2rem' }}>
+        <div style={{ maxWidth: '1300px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '0.4rem', fontFamily: 'Jost, sans-serif', fontSize: '0.62rem', color: '#8C8680' }}>
+          <Link to="/" style={{ color: '#8C8680', textDecoration: 'none' }}>Home</Link>
+          <span>›</span>
+          <span style={{ color: '#0D0D0D', fontWeight: 500 }}>Shop</span>
+          {filters.category && <><span>›</span><span style={{ color: '#0D0D0D', fontWeight: 500 }}>{filters.category}</span></>}
+        </div>
+      </div>
+
       {/* Page Header */}
       <div style={{ backgroundColor: '#0D0B08', padding: '4rem 2rem 3.5rem', textAlign: 'center' }}>
         <p style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.58rem', fontWeight: 500, letterSpacing: '0.3em', textTransform: 'uppercase', color: GOLD, marginBottom: '0.7rem' }}>Handcrafted Leather</p>

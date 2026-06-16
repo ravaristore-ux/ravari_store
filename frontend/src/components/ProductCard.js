@@ -75,7 +75,17 @@ function ProductCard({ product, onAddToCart, onToggleWishlist, isInWishlist }) {
                 SALE
               </span>
             )}
+            {product.stock === 0 && (
+              <span style={{ backgroundColor: '#4A4642', color: '#E8E4DE', fontFamily: 'Raleway, sans-serif', fontSize: '0.6rem', letterSpacing: '0.15em', fontWeight: 600, padding: '3px 10px' }}>
+                SOLD OUT
+              </span>
+            )}
           </div>
+
+          {/* Out of stock overlay */}
+          {product.stock === 0 && (
+            <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255,255,255,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }} />
+          )}
         </div>
       </Link>
 
@@ -115,12 +125,13 @@ function ProductCard({ product, onAddToCart, onToggleWishlist, isInWishlist }) {
           </div>
 
           <button
-            onClick={() => onAddToCart(product)}
+            onClick={() => product.stock !== 0 && onAddToCart(product)}
+            disabled={product.stock === 0}
             className="flex items-center gap-1.5 hover:opacity-70 transition-opacity"
-            style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.65rem', letterSpacing: '0.1em', fontWeight: 600, color: '#6B3A2A', textTransform: 'uppercase' }}
+            style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.65rem', letterSpacing: '0.1em', fontWeight: 600, color: product.stock === 0 ? '#B8A89A' : '#6B3A2A', textTransform: 'uppercase', cursor: product.stock === 0 ? 'not-allowed' : 'pointer' }}
           >
             <FiShoppingCart size={13} />
-            Add
+            {product.stock === 0 ? 'Sold Out' : 'Add'}
           </button>
         </div>
       </div>

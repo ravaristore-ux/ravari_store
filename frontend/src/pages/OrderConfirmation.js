@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { FiCheckCircle, FiPackage, FiTruck, FiMapPin, FiPhone, FiMail, FiRotateCcw } from 'react-icons/fi';
+import { FiCheckCircle, FiPackage, FiTruck, FiMapPin, FiPhone, FiMail, FiRotateCcw, FiPrinter } from 'react-icons/fi';
 
 const GOLD = '#C9A84C';
 const DARK = '#0D0B08';
@@ -176,6 +176,12 @@ export default function OrderConfirmation() {
               <Link to="/track-order" style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: DARK, backgroundColor: 'transparent', padding: '0.9rem 2rem', textDecoration: 'none', border: `1px solid #D4CFC8` }}>
                 Track My Order
               </Link>
+              {order && (
+                <button onClick={() => window.print()}
+                  style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: DARK, backgroundColor: 'transparent', padding: '0.9rem 2rem', border: `1px solid #D4CFC8`, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <FiPrinter size={14} /> Print Invoice
+                </button>
+              )}
               <a href="https://wa.me/919084260869?text=Hi%20RAVARI%2C%20I%20placed%20an%20order%20and%20need%20help.%20Order%20ID%3A%20" target="_blank" rel="noreferrer"
                 style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.68rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#16A34A', backgroundColor: 'transparent', padding: '0.9rem 2rem', textDecoration: 'none', border: '1px solid #16A34A', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 WhatsApp Support

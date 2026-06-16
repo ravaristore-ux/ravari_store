@@ -161,6 +161,19 @@ function ProductDetail() {
           ]
         }}
       />
+      {/* Breadcrumb */}
+      <div style={{ backgroundColor: '#F8F7F5', borderBottom: '1px solid #E8E4DE', padding: '0.55rem 1.5rem', marginBottom: '0.5rem' }}>
+        <div style={{ maxWidth: '80rem', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap', fontFamily: 'Jost, sans-serif', fontSize: '0.62rem', color: '#8C8680' }}>
+          <Link to="/" style={{ color: '#8C8680', textDecoration: 'none' }}>Home</Link>
+          <span>›</span>
+          <Link to="/products" style={{ color: '#8C8680', textDecoration: 'none' }}>Shop</Link>
+          <span>›</span>
+          <Link to={`/products?category=${encodeURIComponent(product.category)}`} style={{ color: '#8C8680', textDecoration: 'none' }}>{product.category}</Link>
+          <span>›</span>
+          <span style={{ color: '#0D0D0D', fontWeight: 500 }}>{product.name}</span>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* Product Images Section */}
@@ -357,20 +370,28 @@ function ProductDetail() {
 
             {/* Buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
-              {/* SHOP NOW — primary */}
-              <button onClick={handleShopNow}
-                style={{ width: '100%', padding: '1rem', backgroundColor: '#C9A84C', color: '#0D0D0D', fontFamily: 'Jost, sans-serif', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#B8962A'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = '#C9A84C'}>
-                SHOP NOW — ₹{((activeSalePrice || activePrice) * quantity)?.toLocaleString('en-IN')}
-              </button>
-              {/* Add to Cart — secondary */}
-              <button onClick={handleAddToCart}
-                style={{ width: '100%', padding: '1rem', backgroundColor: 'transparent', color: '#0D0D0D', fontFamily: 'Jost, sans-serif', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', border: '1.5px solid #0D0D0D', cursor: 'pointer', transition: 'all 0.2s' }}
-                onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0D0D0D'; e.currentTarget.style.color = '#FFF'; }}
-                onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#0D0D0D'; }}>
-                Add to Cart
-              </button>
+              {product.stock === 0 ? (
+                <div style={{ width: '100%', padding: '1rem', backgroundColor: '#F0EDE8', color: '#8C8680', fontFamily: 'Jost, sans-serif', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', textAlign: 'center', border: '1px solid #E8E4DE' }}>
+                  Out of Stock — Notify me when available via WhatsApp
+                </div>
+              ) : (
+                <>
+                  {/* SHOP NOW — primary */}
+                  <button onClick={handleShopNow}
+                    style={{ width: '100%', padding: '1rem', backgroundColor: '#C9A84C', color: '#0D0D0D', fontFamily: 'Jost, sans-serif', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', border: 'none', cursor: 'pointer', transition: 'background 0.2s' }}
+                    onMouseEnter={e => e.currentTarget.style.backgroundColor = '#B8962A'}
+                    onMouseLeave={e => e.currentTarget.style.backgroundColor = '#C9A84C'}>
+                    SHOP NOW — ₹{((activeSalePrice || activePrice) * quantity)?.toLocaleString('en-IN')}
+                  </button>
+                  {/* Add to Cart — secondary */}
+                  <button onClick={handleAddToCart}
+                    style={{ width: '100%', padding: '1rem', backgroundColor: 'transparent', color: '#0D0D0D', fontFamily: 'Jost, sans-serif', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', border: '1.5px solid #0D0D0D', cursor: 'pointer', transition: 'all 0.2s' }}
+                    onMouseEnter={e => { e.currentTarget.style.backgroundColor = '#0D0D0D'; e.currentTarget.style.color = '#FFF'; }}
+                    onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#0D0D0D'; }}>
+                    Add to Cart
+                  </button>
+                </>
+              )}
 
               {/* WhatsApp Share */}
               <a
