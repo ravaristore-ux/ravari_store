@@ -967,13 +967,17 @@ fastify.post('/api/payment/razorpay/create', async (request, reply) => {
   try {
     const { amount, currency = 'INR', receipt } = request.body || {};
     if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-      reply.code(503); return { error: 'Razorpay not configured' };
+      return reply.code(503).send({ error: 'Razorpay not configured on server' });
     }
     const Razorpay = require('razorpay');
     const rzp = new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
     const order = await rzp.orders.create({ amount: Math.round(amount * 100), currency, receipt: receipt || `rcpt_${Date.now()}` });
     return { success: true, order, key: RAZORPAY_KEY_ID };
-  } catch (e) { reply.code(500); return { error: e.message }; }
+  } catch (e) {
+    const msg = e.error?.description || e.message || 'Razorpay error';
+    console.error('[razorpay create]', msg, JSON.stringify(e.error || {}));
+    return reply.code(500).send({ error: msg });
+  }
 });
 
 // Verify Razorpay payment signature
