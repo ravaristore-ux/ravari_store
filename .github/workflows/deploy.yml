@@ -98,4 +98,4 @@ jobs:
         HOSTINGER_PASSWORD: ${{ secrets.HOSTINGER_PASSWORD }}
 
     - name: Done
-      run: echo "Deployed! Check https://ravari.in"
+      run: echo "Deployed! Check https://ravari.in" && date
