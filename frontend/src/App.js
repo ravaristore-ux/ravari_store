@@ -19,6 +19,7 @@ import TrackOrder from './pages/TrackOrder';
 import ShippingPolicy from './pages/ShippingPolicy';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
+import Login from './pages/Login';
 import WhatsAppButton from './components/WhatsAppButton';
 import './styles/globals.css';
 
@@ -35,6 +36,7 @@ function MainLayout() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />

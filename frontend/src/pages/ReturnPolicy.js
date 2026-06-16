@@ -35,6 +35,7 @@ const Bullet = ({ children }) => (
 
 export default function ReturnPolicy() {
   const [form, setForm] = useState({ orderId: '', customerName: '', customerEmail: '', customerPhone: '', reason: '', description: '' });
+  const [files, setFiles] = useState([]);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -44,11 +45,10 @@ export default function ReturnPolicy() {
     if (!form.orderId || !form.reason) { setError('Order ID and reason are required.'); return; }
     setLoading(true); setError('');
     try {
-      const res = await fetch('/api/returns', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+      files.forEach(f => fd.append('photos', f));
+      const res = await fetch('/api/returns/upload', { method: 'POST', body: fd });
       const data = await res.json();
       if (data.success) { setSubmitted(true); }
       else { setError(data.error || 'Something went wrong. Please try again.'); }
@@ -247,9 +247,32 @@ export default function ReturnPolicy() {
                 </select>
               </div>
 
-              <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ marginBottom: '1rem' }}>
                 <label style={{ display: 'block', fontFamily: 'Jost, sans-serif', fontSize: '0.58rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8C8680', marginBottom: '0.4rem' }}>Additional Details</label>
-                <textarea rows={4} placeholder="Please describe the issue in detail. Attach photos via email to ravari.store@gmail.com with subject: Return - [Order ID]" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} style={{ ...inputStyle, resize: 'vertical', height: '100px' }} onFocus={e => e.target.style.borderColor = GOLD} onBlur={e => e.target.style.borderColor = '#D4CFC8'} />
+                <textarea rows={4} placeholder="Describe the issue in detail — what happened, when you noticed it..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} style={{ ...inputStyle, resize: 'vertical', height: '100px' }} onFocus={e => e.target.style.borderColor = GOLD} onBlur={e => e.target.style.borderColor = '#D4CFC8'} />
+              </div>
+
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', fontFamily: 'Jost, sans-serif', fontSize: '0.58rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: '#8C8680', marginBottom: '0.4rem' }}>
+                  Product Photos <span style={{ color: '#B0A89E', fontWeight: 400 }}>(recommended — up to 5 images)</span>
+                </label>
+                <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '1.5rem', border: `1.5px dashed ${files.length ? GOLD : '#D4CFC8'}`, backgroundColor: files.length ? '#FDFBF6' : '#FAFAF8', cursor: 'pointer', transition: 'border-color 0.2s' }}>
+                  <input type="file" accept="image/*" multiple style={{ display: 'none' }} onChange={e => setFiles(Array.from(e.target.files).slice(0, 5))} />
+                  <span style={{ fontSize: '1.5rem' }}>📷</span>
+                  <span style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.72rem', color: '#4A4642' }}>
+                    {files.length ? `${files.length} photo${files.length > 1 ? 's' : ''} selected` : 'Click to attach photos'}
+                  </span>
+                  <span style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.6rem', color: '#8C8680' }}>JPG, PNG · Max 5 files · Sent directly with your request</span>
+                </label>
+                {files.length > 0 && (
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '0.5rem' }}>
+                    {files.map((f, i) => (
+                      <span key={i} style={{ fontFamily: 'Jost, sans-serif', fontSize: '0.6rem', color: '#4A4642', backgroundColor: '#F0EDE8', padding: '3px 10px', borderRadius: '2px' }}>
+                        {f.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button type="submit" disabled={loading}

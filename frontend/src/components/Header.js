@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiHome } from 'react-icons/fi';
+import { FiSearch, FiHeart, FiShoppingBag, FiMenu, FiX, FiHome, FiUser } from 'react-icons/fi';
 
 const NAV = [
   { label: 'Home',       to: '/'         },
@@ -23,6 +23,7 @@ export default function Header() {
   const location  = useLocation();
   const navigate  = useNavigate();
   const cartItems = useSelector(s => s.cart?.items || []);
+  const isAuthenticated = useSelector(s => s.auth?.isAuthenticated);
   const cartCount = cartItems.reduce((n, i) => n + (i.quantity || 1), 0);
 
   useEffect(() => { setMenuOpen(false); setSearchOpen(false); setSearchQuery(''); }, [location]);
@@ -134,6 +135,9 @@ export default function Header() {
               onClick={() => setSearchOpen(o => !o)}>
               {searchOpen ? <FiX size={19} /> : <FiSearch size={19} />}
             </button>
+            <Link to={isAuthenticated ? '/account' : '/login'} aria-label="My Account" className="hdr-wish" style={iconStyle} onMouseEnter={iconHover} onMouseLeave={iconLeave}>
+              <FiUser size={19} />
+            </Link>
             <Link to="/wishlist" aria-label="Wishlist" className="hdr-wish" style={iconStyle} onMouseEnter={iconHover} onMouseLeave={iconLeave}>
               <FiHeart size={19} />
             </Link>

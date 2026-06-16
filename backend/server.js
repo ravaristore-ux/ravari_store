@@ -1137,6 +1137,138 @@ fastify.post('/api/contact', async (request, reply) => {
   return reply.send({ success: true });
 });
 
+// ── Customer Auth (OTP via email) ────────────────────────────────────────────
+const jwt = require('jsonwebtoken');
+const CUSTOMER_JWT_SECRET = process.env.CUSTOMER_JWT_SECRET || 'ravari-customer-secret-2026';
+const otpStore = new Map(); // email → { otp, expires }
+
+fastify.post('/api/customer/auth/request-otp', async (request, reply) => {
+  const { email } = request.body || {};
+  if (!email || !email.includes('@')) return reply.code(400).send({ error: 'Valid email required' });
+  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  otpStore.set(email.toLowerCase(), { otp, expires: Date.now() + 10 * 60 * 1000 });
+  try {
+    await mailer.sendMail({
+      from: `"RAVARI" <${process.env.GMAIL_USER || 'ravari.store@gmail.com'}>`,
+      to: email,
+      subject: 'Your RAVARI Login OTP',
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;border:1px solid #e0d8cc;">
+          <div style="background:#0D0B08;padding:20px 24px;text-align:center;">
+            <h1 style="font-family:Georgia,serif;color:#C9A84C;letter-spacing:6px;margin:0;font-size:22px;">RAVARI</h1>
+          </div>
+          <div style="padding:28px;text-align:center;">
+            <p style="color:#444;margin-bottom:16px;font-size:15px;">Your one-time login code:</p>
+            <div style="font-size:36px;font-weight:bold;letter-spacing:10px;color:#0D0B08;margin:20px 0;">${otp}</div>
+            <p style="color:#888;font-size:13px;">Valid for 10 minutes. Do not share this code.</p>
+          </div>
+        </div>
+      `,
+    });
+    return { success: true };
+  } catch (e) {
+    return reply.code(500).send({ error: 'Failed to send OTP. Try again.' });
+  }
+});
+
+fastify.post('/api/customer/auth/verify-otp', async (request, reply) => {
+  const { email, otp } = request.body || {};
+  if (!email || !otp) return reply.code(400).send({ error: 'Email and OTP required' });
+  const key = email.toLowerCase();
+  const record = otpStore.get(key);
+  if (!record || record.otp !== String(otp).trim() || Date.now() > record.expires) {
+    return reply.code(401).send({ error: 'Invalid or expired OTP' });
+  }
+  otpStore.delete(key);
+  // Look up customer name from orders
+  let name = email.split('@')[0];
+  try {
+    if (dbReady && pool) {
+      const rows = await query('SELECT customerName FROM orders WHERE customerEmail=? ORDER BY id DESC LIMIT 1', [key]);
+      if (rows.length) name = rows[0].customerName;
+    }
+  } catch (_) {}
+  const user = { email: key, name };
+  const token = jwt.sign(user, CUSTOMER_JWT_SECRET, { expiresIn: '30d' });
+  return { success: true, token, user };
+});
+
+// Customer: get own orders (JWT required)
+fastify.get('/api/customer/orders', async (request, reply) => {
+  const auth = request.headers.authorization || '';
+  if (!auth.startsWith('Bearer ')) return reply.code(401).send({ error: 'Not authenticated' });
+  try {
+    const payload = jwt.verify(auth.slice(7), CUSTOMER_JWT_SECRET);
+    if (!dbReady || !pool) return { orders: [] };
+    const rows = await query(
+      'SELECT id, status, total, subtotal, discount, shipping, paymentMethod, createdAt, items FROM orders WHERE customerEmail=? ORDER BY id DESC',
+      [payload.email]
+    );
+    const orders = rows.map(r => ({ ...r, items: safeJson(r.items, []) }));
+    return { orders };
+  } catch (e) {
+    return reply.code(401).send({ error: 'Invalid token' });
+  }
+});
+
+function safeJson(str, def) { try { return JSON.parse(str || '[]'); } catch { return def; } }
+
+// ── Return form with image upload ─────────────────────────────────────────────
+fastify.post('/api/returns/upload', async (request, reply) => {
+  const parts = request.parts();
+  const fields = {};
+  const attachments = [];
+  for await (const part of parts) {
+    if (part.type === 'field') {
+      fields[part.fieldname] = part.value;
+    } else if (part.type === 'file') {
+      const buf = await part.toBuffer();
+      attachments.push({ filename: part.filename || 'image.jpg', content: buf });
+    }
+  }
+  const { orderId, customerName, customerEmail, customerPhone, reason, description } = fields;
+  if (!orderId || !reason) return reply.code(400).send({ error: 'Order ID and reason are required.' });
+  // Save to DB
+  try {
+    if (dbReady && pool) {
+      await query(
+        'INSERT INTO returns (orderId,customerName,customerEmail,customerPhone,reason,description,status) VALUES (?,?,?,?,?,?,?)',
+        [orderId, customerName || '', customerEmail || '', customerPhone || '', reason, description || '', 'pending']
+      );
+    }
+  } catch (_) {}
+  // Send email with photo attachments
+  try {
+    await mailer.sendMail({
+      from: `"RAVARI Returns" <${process.env.GMAIL_USER || 'ravari.store@gmail.com'}>`,
+      to: 'ravari.store@gmail.com',
+      replyTo: customerEmail || undefined,
+      subject: `Return Request — Order #${orderId} — ${reason}`,
+      html: `
+        <div style="font-family:Arial,sans-serif;max-width:600px;">
+          <div style="background:#0D0B08;padding:20px 24px;">
+            <h1 style="font-family:Georgia,serif;color:#C9A84C;letter-spacing:4px;margin:0;">RAVARI</h1>
+            <p style="color:#aaa;font-size:11px;margin:4px 0 0;text-transform:uppercase;letter-spacing:2px;">Return Request</p>
+          </div>
+          <div style="padding:24px;">
+            <table style="width:100%;font-size:14px;border-collapse:collapse;">
+              <tr><td style="color:#888;padding:6px 0;width:140px;">Order ID</td><td style="font-weight:bold;">#${orderId}</td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Customer</td><td>${customerName || '—'}</td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Email</td><td>${customerEmail || '—'}</td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Phone</td><td>${customerPhone || '—'}</td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Reason</td><td><strong>${reason}</strong></td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Details</td><td>${description || '—'}</td></tr>
+              <tr><td style="color:#888;padding:6px 0;">Photos</td><td>${attachments.length} file(s) attached</td></tr>
+            </table>
+          </div>
+        </div>
+      `,
+      attachments,
+    });
+  } catch (e) { console.error('[returns] mail error:', e.message); }
+  return { success: true };
+});
+
 // Start: listen first, then DB
 fastify.listen({ port: PORT, host: HOST })
   .then(() => { console.log(`[RAVARI] ✅ Listening on ${HOST}:${PORT}`); initDatabase(); })
