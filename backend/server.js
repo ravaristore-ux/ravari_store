@@ -1213,17 +1213,19 @@ fastify.post('/api/contact', async (request, reply) => {
   }
 
   // Save to DB
-  try {
-    await db.query(
-      'INSERT INTO contact_messages (name, email, phone, message, created_at) VALUES (?, ?, ?, ?, NOW())',
-      [name, email, phone || '', message]
-    );
-    await db.query(
-      "INSERT INTO notifications (type, title, message, created_at) VALUES ('contact', ?, ?, NOW())",
-      [`New message from ${name}`, message.substring(0, 120)]
-    );
-  } catch (dbErr) {
-    console.error('[contact] db error:', dbErr.message);
+  if (dbReady && pool) {
+    try {
+      await query(
+        'INSERT INTO contact_messages (name, email, phone, message, created_at) VALUES (?, ?, ?, ?, NOW())',
+        [name, email, phone || '', message]
+      );
+      await query(
+        "INSERT INTO notifications (type, title, message, created_at) VALUES ('contact', ?, ?, NOW())",
+        [`New message from ${name}`, message.substring(0, 120)]
+      );
+    } catch (dbErr) {
+      console.error('[contact] db error:', dbErr.message);
+    }
   }
 
   return reply.send({ success: true });
