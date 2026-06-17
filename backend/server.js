@@ -1178,6 +1178,22 @@ async function sendOrderEmails(orderId, b, paymentLabel) {
   }
 }
 
+// ── Test email endpoint (admin use) ──────────────────────────────────────────
+fastify.get('/api/admin/test-email', async (request, reply) => {
+  const ADMIN = process.env.GMAIL_USER || 'ravari.store@gmail.com';
+  try {
+    await nodemailerInstance.sendMail({
+      from: `"RAVARI Test" <${ADMIN}>`,
+      to: ADMIN,
+      subject: 'RAVARI — Email Test ✓',
+      html: '<p>Email is working correctly from your RAVARI server.</p>',
+    });
+    return { success: true, message: `Test email sent to ${ADMIN}` };
+  } catch (e) {
+    return reply.code(500).send({ success: false, error: e.message, code: e.code });
+  }
+});
+
 // ── Contact form ──────────────────────────────────────────────────────────────
 const mailer = nodemailerInstance; // alias — defined at top of file
 
