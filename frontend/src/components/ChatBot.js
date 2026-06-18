@@ -13,7 +13,7 @@ const FAQS = [
   },
   {
     patterns: ['return', 'exchange', 'refund', 'replace', 'back'],
-    answer: '↩️ We have a **7-day easy return policy**. If you're not happy with your purchase, WhatsApp us within 7 days of delivery with your order ID and photos.',
+    answer: '↩️ We have a **7-day easy return policy**. If you\'re not happy with your purchase, WhatsApp us within 7 days of delivery with your order ID and photos.',
     quick: ['How to return', 'Contact support', 'Track my order'],
   },
   {
