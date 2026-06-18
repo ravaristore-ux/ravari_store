@@ -21,6 +21,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import Login from './pages/Login';
 import WhatsAppButton from './components/WhatsAppButton';
+import ChatBot from './components/ChatBot';
 import './styles/globals.css';
 
 function ScrollToTop() {
@@ -54,6 +55,7 @@ function MainLayout() {
       </main>
       <Footer />
       <WhatsAppButton />
+      <ChatBot />
     </div>
   );
 }
