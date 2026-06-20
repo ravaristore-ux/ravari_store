@@ -1178,6 +1178,112 @@ async function sendOrderEmails(orderId, b, paymentLabel) {
   }
 }
 
+// ── WhatsApp Webhook ──────────────────────────────────────────────────────────
+const WA_VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || 'ravari_webhook_2026';
+const WA_TOKEN        = process.env.WHATSAPP_TOKEN || '';
+const WA_PHONE_ID     = process.env.WHATSAPP_PHONE_ID || '';
+
+const WA_FAQS = [
+  { patterns: ['shipping','delivery','deliver','days','how long','when will','kitne din'],
+    answer: '🚚 We deliver across India in *5–7 business days*. Free shipping on orders above ₹5,000. Below that, flat ₹100 shipping charge.' },
+  { patterns: ['return','exchange','refund','replace','wapas','vapas'],
+    answer: '↩️ We have a *7-day easy return policy*. If you\'re not happy, WhatsApp us within 7 days of delivery with your order ID and photos.' },
+  { patterns: ['payment','pay','upi','card','cod','cash','online','razorpay'],
+    answer: '💳 We accept *UPI, Credit/Debit Cards, Net Banking, Wallets* (via Razorpay) and *Cash on Delivery*. All online payments are 256-bit SSL secured.' },
+  { patterns: ['track','tracking','order status','where is my order','order id'],
+    answer: '📦 Track your order at *ravari.in/track-order*. You\'ll need your Order ID (starts with RAV) and email address.' },
+  { patterns: ['price','cost','how much','rate','discount','offer','sale','coupon'],
+    answer: '🏷️ Our prices range from *₹999 to ₹4,999*. We regularly offer discounts — visit ravari.in to see current offers!' },
+  { patterns: ['material','leather','quality','genuine','real','full grain'],
+    answer: '✨ All RAVARI products are made from *Full Grain Leather* — the highest quality leather. Durable, textured, and reinforced stitching for lasting elegance.' },
+  { patterns: ['bag','wallet','handbag','tote','sling','purse','product','collection'],
+    answer: '👜 We offer *Tote Bags, Sling Bags, Handbags, Wallets* and Accessories — all handcrafted in full grain leather. Visit *ravari.in* to explore!' },
+  { patterns: ['cancel','cancellation'],
+    answer: '❌ To cancel an order, WhatsApp us immediately with your Order ID. We can cancel before it ships. Once shipped, you can return within 7 days.' },
+  { patterns: ['hi','hello','hey','namaste','hii','good morning','good evening','helo'],
+    answer: '👋 Hello! Welcome to *RAVARI* — Luxury Handcrafted Leather Goods.\n\nHow can I help you today? You can ask about:\n• Shipping & delivery\n• Returns & refunds\n• Payments\n• Order tracking\n• Our products' },
+  { patterns: ['contact','support','help','human','agent','call','email','talk','baat'],
+    answer: '📞 Our team is here to help!\n\n📱 *WhatsApp:* +91 90842 60869\n📧 *Email:* ravari.store@gmail.com\n📍 *Address:* 4A Prakash Apartment, 44A Cantt Road, Lucknow — 226001' },
+];
+
+function waFindAnswer(text) {
+  const lower = text.toLowerCase();
+  for (const faq of WA_FAQS) {
+    if (faq.patterns.some(p => lower.includes(p))) return faq.answer;
+  }
+  return '🙏 Thank you for contacting *RAVARI*!\n\nI\'m not sure about that, but our team can help!\n\n📱 *WhatsApp:* +91 90842 60869\n📧 *Email:* ravari.store@gmail.com\n\nVisit us at *ravari.in*';
+}
+
+async function waSendMessage(to, text) {
+  if (!WA_TOKEN || !WA_PHONE_ID) return;
+  try {
+    const https = require('https');
+    const body = JSON.stringify({
+      messaging_product: 'whatsapp',
+      to,
+      type: 'text',
+      text: { body: text },
+    });
+    const options = {
+      hostname: 'graph.facebook.com',
+      path: `/v19.0/${WA_PHONE_ID}/messages`,
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${WA_TOKEN}`,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+      },
+    };
+    await new Promise((resolve, reject) => {
+      const req = https.request(options, res => {
+        res.on('data', () => {});
+        res.on('end', resolve);
+      });
+      req.on('error', reject);
+      req.write(body);
+      req.end();
+    });
+  } catch (e) {
+    console.error('[whatsapp send]', e.message);
+  }
+}
+
+// Webhook verification (Meta calls this to verify the webhook URL)
+fastify.get('/api/whatsapp/webhook', async (request, reply) => {
+  const mode      = request.query['hub.mode'];
+  const token     = request.query['hub.verify_token'];
+  const challenge = request.query['hub.challenge'];
+  if (mode === 'subscribe' && token === WA_VERIFY_TOKEN) {
+    console.log('[whatsapp] Webhook verified');
+    return reply.send(challenge);
+  }
+  return reply.code(403).send('Forbidden');
+});
+
+// Webhook receiver (Meta sends incoming messages here)
+fastify.post('/api/whatsapp/webhook', async (request, reply) => {
+  try {
+    const body = request.body;
+    if (body?.object === 'whatsapp_business_account') {
+      const entry    = body.entry?.[0];
+      const changes  = entry?.changes?.[0];
+      const value    = changes?.value;
+      const messages = value?.messages;
+      if (messages?.length) {
+        const msg  = messages[0];
+        const from = msg.from;
+        const text = msg.text?.body || '';
+        console.log(`[whatsapp] Message from ${from}: ${text}`);
+        const reply_text = waFindAnswer(text);
+        await waSendMessage(from, reply_text);
+      }
+    }
+  } catch (e) {
+    console.error('[whatsapp webhook]', e.message);
+  }
+  return reply.send({ status: 'ok' });
+});
+
 // ── Test email endpoint (admin use) ──────────────────────────────────────────
 fastify.get('/api/admin/test-email', async (request, reply) => {
   const ADMIN = process.env.GMAIL_USER || 'ravari.store@gmail.com';
