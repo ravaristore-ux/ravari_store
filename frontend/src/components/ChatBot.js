@@ -77,12 +77,15 @@ const QUICK_ACTIONS = [
   { label: '👜 View products', msg: 'products' },
 ];
 
-function findAnswer(text) {
-  const lower = text.toLowerCase();
-  for (const faq of FAQS) {
-    if (faq.patterns.some(p => lower.includes(p))) return faq;
-  }
-  return null;
+async function getAIReply(text) {
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: text }),
+  });
+  if (!res.ok) throw new Error('API error');
+  const data = await res.json();
+  return data.reply;
 }
 
 function formatMsg(text) {
@@ -125,25 +128,28 @@ export default function ChatBot() {
     sendMsg(label);
   }
 
-  function sendMsg(text) {
+  async function sendMsg(text) {
     const msg = text || input.trim();
     if (!msg) return;
     setInput('');
     setMsgs(m => [...m, { from: 'user', text: msg }]);
     setTyping(true);
-
-    setTimeout(() => {
-      const faq = findAnswer(msg);
-      const reply = faq
-        ? { from: 'bot', text: faq.answer, quick: faq.quick }
-        : {
-            from: 'bot',
-            text: "I'm not sure about that, but our team can help! 😊\n\nContact us on **WhatsApp** at +91 90842 60869 or email **ravari.store@gmail.com**",
-            quick: ['WhatsApp us now', 'Return policy', 'Track my order'],
-          };
+    try {
+      const replyText = await getAIReply(msg);
+      setMsgs(m => [...m, {
+        from: 'bot',
+        text: replyText,
+        quick: ['WhatsApp us now', 'Track my order', 'Return policy', 'Shop now'],
+      }]);
+    } catch (_) {
+      setMsgs(m => [...m, {
+        from: 'bot',
+        text: "I'm having trouble connecting. Please WhatsApp us at **+91 90842 60869** for instant help! 😊",
+        quick: ['WhatsApp us now', 'Track my order'],
+      }]);
+    } finally {
       setTyping(false);
-      setMsgs(m => [...m, reply]);
-    }, 800);
+    }
   }
 
   return (

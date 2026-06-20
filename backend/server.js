@@ -1274,7 +1274,7 @@ fastify.post('/api/whatsapp/webhook', async (request, reply) => {
         const from = msg.from;
         const text = msg.text?.body || '';
         console.log(`[whatsapp] Message from ${from}: ${text}`);
-        const reply_text = waFindAnswer(text);
+        const reply_text = await waGetAIReply(text);
         await waSendMessage(from, reply_text);
       }
     }
@@ -1283,6 +1283,78 @@ fastify.post('/api/whatsapp/webhook', async (request, reply) => {
   }
   return reply.send({ status: 'ok' });
 });
+
+// ── Gemini AI Chat endpoint ───────────────────────────────────────────────────
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
+
+const RAVARI_SYSTEM_PROMPT = `You are RAVARI's friendly customer support assistant. RAVARI is a luxury handcrafted leather goods brand based in Lucknow, India.
+
+Key facts:
+- Products: Tote Bags, Sling Bags, Handbags, Wallets — all Full Grain Leather, handcrafted
+- Price range: ₹999 to ₹4,999
+- Shipping: 5–7 business days across India. Free shipping above ₹5,000, else ₹100
+- Return policy: 7-day easy returns. WhatsApp within 7 days with order ID and photos
+- Payment: UPI, Credit/Debit Cards, Net Banking, Wallets (Razorpay) and Cash on Delivery
+- Track orders: Track Order page on website, need Order ID (starts with RAV) and email
+- WhatsApp: +91 90842 60869
+- Email: ravari.store@gmail.com
+- Address: 4A Prakash Apartment, 44A Cantt Road, Lucknow — 226001
+- Gift wrapping available for ₹49 extra at checkout
+
+Reply in the same language the customer uses (Hindi or English). Keep replies short, friendly and helpful. Do not make up information not listed above.`;
+
+async function geminiChat(userMessage) {
+  return new Promise((resolve) => {
+    const https = require('https');
+    const payload = JSON.stringify({
+      system_instruction: { parts: [{ text: RAVARI_SYSTEM_PROMPT }] },
+      contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+      generationConfig: { maxOutputTokens: 300, temperature: 0.7 },
+    });
+    const options = {
+      hostname: 'generativelanguage.googleapis.com',
+      path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) },
+    };
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const json = JSON.parse(data);
+          const text = json.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not process your request. Please WhatsApp us at +91 90842 60869.';
+          resolve(text);
+        } catch (_) {
+          resolve('Sorry, I could not process your request. Please WhatsApp us at +91 90842 60869.');
+        }
+      });
+    });
+    req.on('error', () => resolve('Sorry, I could not process your request. Please WhatsApp us at +91 90842 60869.'));
+    req.write(payload);
+    req.end();
+  });
+}
+
+fastify.post('/api/chat', async (request, reply) => {
+  const { message } = request.body || {};
+  if (!message) return reply.code(400).send({ error: 'message required' });
+  if (!GEMINI_API_KEY) return reply.code(500).send({ error: 'AI not configured' });
+  try {
+    const response = await geminiChat(message);
+    return { reply: response };
+  } catch (e) {
+    return reply.code(500).send({ error: e.message });
+  }
+});
+
+// WhatsApp also uses Gemini AI now
+async function waGetAIReply(text) {
+  if (GEMINI_API_KEY) {
+    return await geminiChat(text);
+  }
+  return waFindAnswer(text);
+}
 
 // ── Test email endpoint (admin use) ──────────────────────────────────────────
 fastify.get('/api/admin/test-email', async (request, reply) => {
